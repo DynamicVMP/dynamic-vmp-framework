@@ -119,6 +119,11 @@ public class DynamicVMP {
     static final Integer NUM_OBJ_FUNCT_COMP = 3;
 
     /**
+     * Historical objective functions values size
+     */
+    static final Integer HISTORIAL_DATA_SIZE = 5;
+
+    /**
      * Map of the Heuristics Algorithm
      * heuristicsMap.put("FF", 0);
      * heuristicsMap.put("BF", 1);
@@ -263,12 +268,16 @@ public class DynamicVMP {
                         VirtualMachine.cloneVMsList(derivedVMs), placementScore);
                 placements.put(actualTimeUnit, heuristicPlacement);
 
-                if(placements.size()>5){
+                //check the historical information
+                if(placements.size()>HISTORIAL_DATA_SIZE){
+                    //collect O.F. historical values
                     valuesSelectedForecast.clear();
-                    for(int valuesIterator= nextTimeUnit-5; valuesIterator<=actualTimeUnit;valuesIterator++){
-                        valuesSelectedForecast.add(placements.get(valuesIterator).getPlacementScore());
+                    for(int timeIterator= nextTimeUnit-HISTORIAL_DATA_SIZE; timeIterator<=actualTimeUnit;timeIterator++){
+                        valuesSelectedForecast.add(placements.get(timeIterator).getPlacementScore());
                     }
-                    if(placements.size()>5 && Utils.callToReconfiguration(valuesSelectedForecast)){
+
+                    //check if a  call for reconfiguration is needed and set the init time
+                    if(Utils.callToReconfiguration(valuesSelectedForecast)){
                         memeticTimeInit = nextTimeUnit;
                     }else{
                         memeticTimeInit=-1;
