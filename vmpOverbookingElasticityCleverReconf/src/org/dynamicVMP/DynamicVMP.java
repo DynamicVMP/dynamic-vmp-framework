@@ -379,11 +379,12 @@ public class DynamicVMP {
 //        System.out.println("Request Serviced(VM Allocated)\t: \t" + requestsProcess[0]);
 //        System.out.println("********************************************************\n");
 
-        Utils.printToFileMap(POWER_CONSUMPTION_FILE, powerByTime);
-        Utils.printToFileMap(WASTED_RESOURCES_FILE, wastedResourcesRatioByTime);
-        Utils.printToFileMap(ECONOMICAL_REVENUE_FILE, revenueByTime);
+        Utils.printToFile(POWER_CONSUMPTION_FILE, powerByTime);
+        Utils.printToFile(WASTED_RESOURCES_FILE, wastedResourcesRatioByTime);
+        Utils.printToFile(ECONOMICAL_REVENUE_FILE, revenueByTime);
         Utils.printToFile(WASTED_RESOURCES_RATIO_FILE, wastedResources);
         Utils.printToFile(SCENARIOS_SCORES, scenarioScored);
+        Utils.printToFile(RECONFIGURATION_CALL_TIMES,"\n");
 
         Utils.executorServiceTermination(executorService);
     }

@@ -266,23 +266,6 @@ public class Utils {
         return  maxPower;
     }
 
-    /**
-     * Print to File
-     *
-     * @param file    File name
-     * @param toPrint Objective Function
-     */
-    public static void printToFile(String file, List<?> toPrint) throws IOException {
-
-        toPrint.forEach(consumer -> {
-            try {
-                Files.write(Paths.get(file), consumer.toString().getBytes(), StandardOpenOption.APPEND);
-                Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
-            } catch (IOException e) {
-                Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
-            }
-        });
-    }
 
     /**
      * Print to File
@@ -292,31 +275,43 @@ public class Utils {
      */
     public static void printToFile(String file, Object toPrint) throws IOException {
 
-        try {
-            Files.write(Paths.get(file), toPrint.toString().getBytes(), StandardOpenOption.APPEND);
-            Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
-        }
+	    if(!Files.exists(Paths.get(Utils.OUTPUT))){
+		    Files.createDirectory(Paths.get(Utils.OUTPUT));
+	    }
+
+	    if(toPrint instanceof Collection<?>){
+		    List<?> toPrintList = (ArrayList<String>)toPrint;
+		    toPrintList.forEach(consumer -> {
+			    try {
+				    Files.write(Paths.get(file), consumer.toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				    Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
+			    } catch (IOException e) {
+				    Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
+			    }
+		    });
+
+	    }else if(toPrint instanceof  Map<?,?>){
+		    Map<Integer,Float> toPrintMap  = (Map<Integer,Float>)toPrint;
+		    for (Map.Entry<Integer, Float> entry : toPrintMap.entrySet()) {
+			    try {
+				    Files.write(Paths.get(file), entry.getValue().toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				    Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
+			    } catch (IOException e) {
+				    Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
+			    }
+		    }
+	    }else{
+		    try {
+			    Files.write(Paths.get(file), toPrint.toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+			    Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
+		    } catch (IOException e) {
+			    Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
+		    }
+	    }
+
+
     }
 
-    /**
-     * Print to File
-     *
-     * @param file    File name
-     * @param toPrint Objective Function
-     */
-    public static void printToFileMap(String file, Map<Integer, Float> toPrint) throws IOException {
-
-        for (Map.Entry<Integer, Float> entry : toPrint.entrySet()) {
-            try {
-                Files.write(Paths.get(file), entry.getValue().toString().getBytes(), StandardOpenOption.APPEND);
-                Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
-            } catch (IOException e) {
-                Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
-            }
-        }
-    }
 
     /**
      * Clones a List of Float elements
