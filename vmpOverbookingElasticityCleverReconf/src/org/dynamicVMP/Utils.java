@@ -626,8 +626,10 @@ public class Utils {
         DynamicVMP.EXECUTION_DURATION = new Integer(parameter.get(8));
         DynamicVMP.LINK_CAPACITY = new Float(parameter.get(9));
         DynamicVMP.MIGRATION_FACTOR_LOAD = new Float(parameter.get(10));
+	    DynamicVMP.HISTORICAL_DATA_SIZE = new Integer(parameter.get(11));
+	    DynamicVMP.FORECAST_SIZE = new Integer(parameter.get(12));
 
-        for ( int i = 11; i < parameter.size(); i++ ) {
+        for ( int i = 13; i < parameter.size(); i++ ) {
             scenariosFiles.add(parameter.get(i));
         }
     }
@@ -687,9 +689,8 @@ public class Utils {
 	 *
 	 * @return
 	 */
-	public static Boolean callToReconfiguration(List<Float> series){
-		Integer nForecast = 3;
-		List<Float> resultForecasting = calculateNForecast(series,nForecast);
+	public static Boolean callToReconfiguration(List<Float> series, Integer forecastSize){
+		List<Float> resultForecasting = calculateNForecast(series,forecastSize);
 		for (int i = 1; i < resultForecasting.size(); i++) {
 			if (resultForecasting.get(i-1).compareTo(resultForecasting.get(i)) > 0){
 				return false;

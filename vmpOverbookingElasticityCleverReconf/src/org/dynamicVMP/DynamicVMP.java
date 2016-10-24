@@ -122,7 +122,12 @@ public class DynamicVMP {
     /**
      * Historical objective functions values size
      */
-    static final Integer HISTORIAL_DATA_SIZE = 5;
+    static Integer HISTORICAL_DATA_SIZE;
+
+    /**
+     * number of values ​​to predict
+     */
+    static Integer FORECAST_SIZE;
 
     /**
      * Map of the Heuristics Algorithm
@@ -271,16 +276,16 @@ public class DynamicVMP {
                 placements.put(actualTimeUnit, heuristicPlacement);
 
                 //check the historical information
-                if(nextTimeUnit!=-1 && placements.size()>HISTORIAL_DATA_SIZE &&
+                if(nextTimeUnit!=-1 && placements.size()> HISTORICAL_DATA_SIZE &&
                         !isReconfigurationActive && !isMigrationActive ){
                     //collect O.F. historical values
                     valuesSelectedForecast.clear();
-                    for(int timeIterator=nextTimeUnit-HISTORIAL_DATA_SIZE; timeIterator<=actualTimeUnit;timeIterator++){
+                    for(int timeIterator = nextTimeUnit- HISTORICAL_DATA_SIZE; timeIterator<=actualTimeUnit; timeIterator++){
                         valuesSelectedForecast.add(placements.get(timeIterator).getPlacementScore());
                     }
 
                     //check if a  call for reconfiguration is needed and set the init time
-                    if(Utils.callToReconfiguration(valuesSelectedForecast)){
+                    if(Utils.callToReconfiguration(valuesSelectedForecast,FORECAST_SIZE)){
                         Utils.printToFile(RECONFIGURATION_CALL_TIMES,nextTimeUnit);
                         memeticTimeInit = nextTimeUnit;
                         isReconfigurationActive=true;
