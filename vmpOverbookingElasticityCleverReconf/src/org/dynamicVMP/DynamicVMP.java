@@ -281,7 +281,11 @@ public class DynamicVMP {
                     //collect O.F. historical values
                     valuesSelectedForecast.clear();
                     for(int timeIterator = nextTimeUnit- HISTORICAL_DATA_SIZE; timeIterator<=actualTimeUnit; timeIterator++){
-                        valuesSelectedForecast.add(placements.get(timeIterator).getPlacementScore());
+                        if(placements.get(timeIterator)!=null){
+                            valuesSelectedForecast.add(placements.get(timeIterator).getPlacementScore());
+                        }else{
+                            valuesSelectedForecast.add(0F);
+                        }
                     }
 
                     //check if a  call for reconfiguration is needed and set the init time
