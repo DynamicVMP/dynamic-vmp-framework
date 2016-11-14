@@ -13,9 +13,9 @@ import java.util.List;
 /**
  * @author Leonardo Benitez.
  */
-public class DistanceOriginEvaluation implements FitnessEvaluation{
+public class EvaluationByScalarizationMethod implements FitnessEvaluation{
 
-    public DistanceOriginEvaluation() {
+    public EvaluationByScalarizationMethod() {
         super();
     }
 

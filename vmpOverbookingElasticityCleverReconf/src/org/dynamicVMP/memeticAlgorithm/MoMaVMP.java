@@ -4,11 +4,8 @@ import org.domain.APrioriValue;
 import org.domain.PhysicalMachine;
 import org.domain.Placement;
 import org.domain.VirtualMachine;
-import org.dynamicVMP.DynamicVMP;
-import org.dynamicVMP.ObjectivesFunctions;
 import org.dynamicVMP.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,7 +53,7 @@ public class MoMaVMP {
         Crossover crossoverOperator = new OnePointCrossover(settings.getCrossoverProb());
         Mutation mutationOperator = new UniformMutation();
         Initialization initialization = new Initialization();
-        FitnessEvaluation fitnessEvaluator = new DistanceOriginEvaluation();
+        FitnessEvaluation fitnessEvaluator = new EvaluationByScalarizationMethod();
         Population populationQ,populationP;
 
         int generation = 0;
