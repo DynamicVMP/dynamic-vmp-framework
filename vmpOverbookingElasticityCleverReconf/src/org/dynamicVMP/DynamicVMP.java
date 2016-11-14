@@ -137,7 +137,7 @@ public class DynamicVMP {
     /**
      * Weight for Weighted Sum (Offline)
      */
-    public static Float WEIGHT_OFFLINE = 0.33F;
+    public static Float WEIGHT_OFFLINE = 0.25F;
 
     /**
      * Map of the Scalarization Method
