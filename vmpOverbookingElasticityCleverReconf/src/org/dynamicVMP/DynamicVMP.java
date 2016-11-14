@@ -130,6 +130,25 @@ public class DynamicVMP {
     static Integer FORECAST_SIZE;
 
     /**
+     * Weight for Weighted Sum (Online)
+     */
+    static Float WEIGHT_ONLINE = 0.33F;
+
+    /**
+     * Weight for Weighted Sum (Offline)
+     */
+    public static Float WEIGHT_OFFLINE = 0.33F;
+
+    /**
+     * Map of the Scalarization Method
+     * ED -> Euclidean Distance
+     * CD -> Chevyshev Distance
+     * MD -> Manhattan Distance
+     * WS -> Weighted Sum
+     */
+    static String SCALARIZATION_METHOD;
+
+    /**
      * Map of the Heuristics Algorithm
      * heuristicsMap.put("FF", 0);
      * heuristicsMap.put("BF", 1);

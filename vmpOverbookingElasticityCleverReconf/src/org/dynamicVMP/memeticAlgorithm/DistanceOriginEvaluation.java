@@ -3,6 +3,7 @@ package org.dynamicVMP.memeticAlgorithm;
 import org.domain.APrioriValue;
 import org.domain.PhysicalMachine;
 import org.domain.VirtualMachine;
+import org.dynamicVMP.DynamicVMP;
 import org.dynamicVMP.ObjectivesFunctions;
 import org.dynamicVMP.Utils;
 
@@ -69,7 +70,7 @@ public class DistanceOriginEvaluation implements FitnessEvaluation{
             normalizedOjbFunctions.add(iteratorObjFunctions,normalizedValue);
         }
 
-        Float distance = ObjectivesFunctions.distanceFromOrigin(normalizedOjbFunctions);
+        Float distance = ObjectivesFunctions.getScalarizationMethod(normalizedOjbFunctions, DynamicVMP.WEIGHT_OFFLINE);
         individual.setFitness(distance);
 
     }

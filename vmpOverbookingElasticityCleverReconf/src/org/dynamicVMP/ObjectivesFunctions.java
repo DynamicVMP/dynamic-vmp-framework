@@ -12,7 +12,6 @@ package org.dynamicVMP;
 import org.domain.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +42,7 @@ public class ObjectivesFunctions {
      * Minimum Revenue is 0 (All VMs are served)
      */
     static final Float MIN_REVENUE = 0F;
+    static final Float WSConstant = 0.25F;
 
     private ObjectivesFunctions() {
         // Default Constructor
@@ -266,7 +266,21 @@ public class ObjectivesFunctions {
      * @param objFunctValues List of objective function value normalized.
      * @return distance from origin
      */
-    public static Float distanceFromOrigin(List<Float> objFunctValues){
+    public static Float getScalarizationMethod(List<Float> objFunctValues, Float weight){
+
+        if("ED".equals(DynamicVMP.SCALARIZATION_METHOD)) {
+            return getEuclideanDistance(objFunctValues);
+        } else if("CD".equals(DynamicVMP.SCALARIZATION_METHOD)) {
+            return getChebyshevDistance(objFunctValues);
+        } else if("MD".equals(DynamicVMP.SCALARIZATION_METHOD)) {
+            return getManhattanDistance(objFunctValues);
+        } else {
+            return getWeightedSum(objFunctValues, weight);
+        }
+
+    }
+
+    private static Float getEuclideanDistance(final List<Float> objFunctValues) {
 
         float tempSum = 0;
         for (Float objFunctValue : objFunctValues) {
@@ -275,6 +289,33 @@ public class ObjectivesFunctions {
         }
         Double distance = Math.sqrt(tempSum);
         return distance.floatValue();
+    }
+
+    private static Float getChebyshevDistance(final List<Float> objFunctValues) {
+
+        return objFunctValues.stream().max(Float::compareTo).get();
+
+    }
+
+    private static Float getManhattanDistance(final List<Float> objFunctValues) {
+
+        Double d = objFunctValues.stream().mapToDouble(Float::doubleValue).sum();
+
+        return d.floatValue();
+
+    }
+
+    private static Float getWeightedSum(final List<Float> objFunctValues, Float weight) {
+
+        float tempSum = 0F;
+
+        for (Float objFunctValue : objFunctValues) {
+            //sum the square of each objective function
+            tempSum += weight * objFunctValue;
+        }
+
+        return tempSum;
+
     }
 
     /**
@@ -352,7 +393,7 @@ public class ObjectivesFunctions {
         objectiveFunctionsResult.add(revenueResult);
         objectiveFunctionsResult.add(wastedResourcesResult);
 
-        return ObjectivesFunctions.distanceFromOrigin(objectiveFunctionsResult);
+        return ObjectivesFunctions.getScalarizationMethod(objectiveFunctionsResult, DynamicVMP.WEIGHT_ONLINE);
     }
 
     /**

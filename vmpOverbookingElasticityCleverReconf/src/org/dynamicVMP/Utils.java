@@ -525,7 +525,7 @@ public class Utils {
 					,aPrioriValue.getMaxValue());
 			normalizedValues.add(normalizedValue);
 		}
-		return ObjectivesFunctions.distanceFromOrigin(normalizedValues);
+		return ObjectivesFunctions.getScalarizationMethod(normalizedValues, DynamicVMP.WEIGHT_OFFLINE);
 	}
 
 
@@ -628,8 +628,9 @@ public class Utils {
         DynamicVMP.MIGRATION_FACTOR_LOAD = new Float(parameter.get(10));
 	    DynamicVMP.HISTORICAL_DATA_SIZE = new Integer(parameter.get(11));
 	    DynamicVMP.FORECAST_SIZE = new Integer(parameter.get(12));
+        DynamicVMP.SCALARIZATION_METHOD = parameter.get(13);
 
-        for ( int i = 13; i < parameter.size(); i++ ) {
+        for ( int i = 14; i < parameter.size(); i++ ) {
             scenariosFiles.add(parameter.get(i));
         }
     }
