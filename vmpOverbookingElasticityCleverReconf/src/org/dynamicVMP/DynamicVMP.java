@@ -32,7 +32,9 @@ public class DynamicVMP {
     static final String WASTED_RESOURCES_RATIO_FILE = Utils.OUTPUT + "wasted_resources_ratio";
     static final String SCENARIOS_SCORES = Utils.OUTPUT + "scenarios_scores";
     static final String PLACEMENT_SCORE = Utils.OUTPUT + "resources_per_scenario";
-    static final String RECONFIGURATION_CALL_TIMES = Utils.OUTPUT + "reconfiguration_call_times";
+    static final String RECONFIGURATION_CALL_TIMES_FILE = Utils.OUTPUT + "reconfiguration_call_times";
+    static final String ECONOMICAL_PENALTIES_FILE = Utils.OUTPUT + "economical_penalties";
+    static final String LEASING_COSTS_FILE = Utils.OUTPUT + "leasing_costs";
 
     // EXPERIMENTS PARAMETERS
 
@@ -193,6 +195,9 @@ public class DynamicVMP {
 
     public static final String DYNAMIC_VMP = "DynamicVMP";
 
+    static Float ECONOMICAL_PENALTIES = 0F;
+    static Float LEASING_COSTS = 0F;
+
     private DynamicVMP () {
         // Default Constructor
     }
@@ -284,6 +289,8 @@ public class DynamicVMP {
                 Float placementScore = ObjectivesFunctions.getDistanceOrigenByTime(request.getTime(),
                         maxPower, powerByTime, revenueByTime, wastedResourcesRatioByTime);
 
+                updateLeasingCosts(derivedVMs);
+
                 //        TODO: Only for debug
                 Utils.printToFile(scenarioFile, placementScore);
 
@@ -309,7 +316,7 @@ public class DynamicVMP {
 
                     //check if a  call for reconfiguration is needed and set the init time
                     if(Utils.callToReconfiguration(valuesSelectedForecast,FORECAST_SIZE)){
-                        Utils.printToFile(RECONFIGURATION_CALL_TIMES,nextTimeUnit);
+                        Utils.printToFile(RECONFIGURATION_CALL_TIMES_FILE,nextTimeUnit);
                         memeticTimeInit = nextTimeUnit;
                         isReconfigurationActive=true;
                     }else{
@@ -407,12 +414,14 @@ public class DynamicVMP {
 //        System.out.println("Request Serviced(VM Allocated)\t: \t" + requestsProcess[0]);
 //        System.out.println("********************************************************\n");
 
-        Utils.printToFile(POWER_CONSUMPTION_FILE, powerByTime);
-        Utils.printToFile(WASTED_RESOURCES_FILE, wastedResourcesRatioByTime);
-        Utils.printToFile(ECONOMICAL_REVENUE_FILE, revenueByTime);
+        Utils.printToFile(POWER_CONSUMPTION_FILE, Utils.getAvgPwConsumptionNormalized(powerByTime));
+        Utils.printToFile(WASTED_RESOURCES_FILE, Utils.getAvgResourcesWNormalized(wastedResourcesRatioByTime));
+        Utils.printToFile(ECONOMICAL_REVENUE_FILE, Utils.getAvgRevenueNormalized(revenueByTime));
         Utils.printToFile(WASTED_RESOURCES_RATIO_FILE, wastedResources);
         Utils.printToFile(SCENARIOS_SCORES, scenarioScored);
-        Utils.printToFile(RECONFIGURATION_CALL_TIMES,"\n");
+        Utils.printToFile(RECONFIGURATION_CALL_TIMES_FILE,"\n");
+        Utils.printToFile(ECONOMICAL_PENALTIES_FILE, ECONOMICAL_PENALTIES);
+        Utils.printToFile(LEASING_COSTS_FILE,LEASING_COSTS);
 
         Utils.executorServiceTermination(executorService);
     }
@@ -733,6 +742,28 @@ public class DynamicVMP {
 			}
 		}
 		return false;
+    }
+
+    public static void updateEconomicalPenalties(VirtualMachine vm, Resources resourcesViolated){
+
+        Float violationRevenue = 0F;
+        violationRevenue += resourcesViolated.getCpu() * vm.getRevenue().getCpu();
+        violationRevenue += resourcesViolated.getRam() * vm.getRevenue().getRam();
+        violationRevenue += resourcesViolated.getNet() * vm.getRevenue().getNet();
+
+        ECONOMICAL_PENALTIES += violationRevenue;
+    }
+
+    public static void updateLeasingCosts(List<VirtualMachine> derivedVMs){
+
+        Float leasingCostRevenue = 0F;
+        for (VirtualMachine dvm : derivedVMs) {
+            leasingCostRevenue += dvm.getResources().get(0) * dvm.getRevenue().getCpu() * DynamicVMP.DERIVE_COST;
+            leasingCostRevenue += dvm.getResources().get(1) * dvm.getRevenue().getRam() * DynamicVMP.DERIVE_COST;
+            leasingCostRevenue += dvm.getResources().get(2) * dvm.getRevenue().getNet() * DynamicVMP.DERIVE_COST;
+        }
+
+        LEASING_COSTS+= leasingCostRevenue;
     }
 
 }

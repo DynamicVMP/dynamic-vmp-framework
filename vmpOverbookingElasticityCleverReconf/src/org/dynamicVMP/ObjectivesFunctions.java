@@ -373,7 +373,7 @@ public class ObjectivesFunctions {
             wastedResourcesRatioByTime.put(timeUnit, 0F);
         }
         // Power Consumption
-        normalizedPowerConsumption = Utils.normalizeValue(powerByTime.get(timeUnit), MIN_REVENUE, maxPower);
+        normalizedPowerConsumption = Utils.normalizeValue(powerByTime.get(timeUnit), MIN_POWER, maxPower);
 
         // Revenue
         if(revenueByTime.get(timeUnit) != null && revenueByTime.get(timeUnit) > 0) {

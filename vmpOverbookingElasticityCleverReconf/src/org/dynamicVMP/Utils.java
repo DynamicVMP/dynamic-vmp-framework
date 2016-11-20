@@ -409,7 +409,10 @@ public class Utils {
      * @return Normalized value
      */
     public static  Float normalizeValue(Float value, Float minValue, Float maxValue) {
-        return (value - minValue)/(maxValue - minValue);
+        if(value==0 || maxValue.equals(minValue)){
+	        return 0F;
+        }
+	    return (value - minValue)/(maxValue - minValue);
     }
 
     /**
@@ -687,11 +690,15 @@ public class Utils {
 	}
 
 	/**
+	 * Makes a forecast of n possible values ​​of f(x) to decide to call or
+	 * not to reconfiguration
+	 * @return true: do reconfiguration or false: don't do reconfiguration
 	 *
-	 * @return
 	 */
 	public static Boolean callToReconfiguration(List<Float> series, Integer forecastSize){
 		List<Float> resultForecasting = calculateNForecast(series,forecastSize);
+
+		// check if the condition to call reconfiguration "f1(x)<f2(x)<...<fn(x)" is met.
 		for (int i = 1; i < resultForecasting.size(); i++) {
 			if (resultForecasting.get(i-1).compareTo(resultForecasting.get(i)) > 0){
 				return false;
@@ -699,5 +706,62 @@ public class Utils {
 		}
 		return true;
 	}
+
+	/**
+	 * Obtains the average of a list of float numbers
+	 * @param listNumbers list of float numbers
+	 * @return the average of the list of numberss
+	 */
+	public static Float average(List<Float> listNumbers){
+		Float sum = 0F;
+		for(Float n : listNumbers ){
+			sum+=n;
+		}
+		return listNumbers.isEmpty()? 0 : sum/listNumbers.size();
+	}
+
+	/**
+	 *
+	 * @param pwConsumptionByTime
+	 * @return
+	 */
+	public static Float getAvgPwConsumptionNormalized(Map<Integer,Float>  pwConsumptionByTime){
+        List<Float> pwConsumptionNormalizedList = pwConsumptionByTime.entrySet().stream().map(pw->{
+	        Float revenue = pw.getValue();
+	        return normalizeValue(revenue,ObjectivesFunctions.MIN_POWER,DynamicVMP.MAX_POWER);
+        }).collect(Collectors.toList());
+
+		return average(pwConsumptionNormalizedList);
+	}
+
+	/**
+	 *
+	 * @param revenueByTime
+	 * @return
+	 */
+	public static Float getAvgRevenueNormalized(Map<Integer,Float> revenueByTime){
+		List<Float> revenueNormalizedList = revenueByTime.entrySet().stream().map(r->{
+			Integer timeUnit = r.getKey();
+			Float revenue = r.getValue();
+			Float maxRevenueValue = DynamicVMP.REVENUE_APRIORI_TIME.get(timeUnit);
+			return normalizeValue(revenue,ObjectivesFunctions.MIN_REVENUE,maxRevenueValue);
+		}).collect(Collectors.toList());
+		return average(revenueNormalizedList);
+
+	}
+
+	/**
+	 *
+	 * @param wastedResourcesByTime
+	 * @return
+	 */
+	public static Float getAvgResourcesWNormalized(Map<Integer,Float> wastedResourcesByTime){
+		List<Float> wastedResourcesList = wastedResourcesByTime.entrySet().stream().map(
+				wr->wr.getValue())
+				.collect(Collectors.toList());
+		return average(wastedResourcesList);
+	}
+
+
 
 }

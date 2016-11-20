@@ -174,6 +174,7 @@ public class Heuristics {
         Resources res = new Resources(cpuViolation, ramViolation, netViolation);
         Violation violation = new Violation(timeViolation, res);
 
+        DynamicVMP.updateEconomicalPenalties(vm,res);
         DynamicVMP.getUnsatisfiedResources().put(vm.getId(), violation);
     }
 
