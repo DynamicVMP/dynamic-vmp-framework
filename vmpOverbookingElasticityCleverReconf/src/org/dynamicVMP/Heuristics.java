@@ -59,8 +59,6 @@ public class Heuristics {
      * @param virtualMachines      Virtual Machines
      * @param derivedVMs           List of Derived Virtual Machine
      * @param physicalMachines     List of Physical Machines
-     * @param faultTolerance       Flag that indicates if it is applying tolerance to failures
-     * @param protectionFactor     Flag that indicates the degree of Overbooking
      * @return <b>True</b>, if PM can host new Resources
      */
     public static Boolean updateVM(Scenario s, List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs,
@@ -271,6 +269,7 @@ public class Heuristics {
     private static boolean allocateVMToDC(final Scenario s, final List<PhysicalMachine> physicalMachines,
             final List<VirtualMachine> virtualMachines) {
 
+        // If the VM is new, we set the utilization to 100%, we don't know this information apriori
         Resources uti = new Resources(100F, 100F, 100F);
 
         VirtualMachine vm = new VirtualMachine(s.getVirtualMachineID(), s.getResources(), s.getRevenue(),

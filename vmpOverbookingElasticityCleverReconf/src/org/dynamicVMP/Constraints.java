@@ -46,19 +46,19 @@ public class Constraints {
                 - (oldVm.getResources().get(0) * oldVm.getUtilization().get(0)/100 )
                 + (vm.getResources().get(0) * vm.getUtilization().get(0)/100)
                 + (vm.getResources().get(0) * (1- vm.getUtilization().get(0)/100)*DynamicVMP.PROTECTION_FACTOR)
-                <= pm.getResources().get(0);
+                < pm.getResources().get(0);
 
         Boolean checkRAM = pm.getResourcesRequested().get(1)
                 - (oldVm.getResources().get(1) * oldVm.getUtilization().get(1)/100 )
                 + (vm.getResources().get(1) * vm.getUtilization().get(1)/100)
                 + (vm.getResources().get(1) * (1- vm.getUtilization().get(1)/100)*DynamicVMP.PROTECTION_FACTOR)
-                <= pm.getResources().get(1);
+                < pm.getResources().get(1);
 
         Boolean checkNET = pm.getResourcesRequested().get(2)
                 - (oldVm.getResources().get(2) * oldVm.getUtilization().get(2)/100 )
                 + (vm.getResources().get(2) * vm.getUtilization().get(2)/100)
                 + (vm.getResources().get(2) * (1- vm.getUtilization().get(2)/100)*DynamicVMP.PROTECTION_FACTOR)
-                <= pm.getResources().get(2);
+                < pm.getResources().get(2);
 
         Boolean flag = checkCPU && checkRAM && checkNET;
 
