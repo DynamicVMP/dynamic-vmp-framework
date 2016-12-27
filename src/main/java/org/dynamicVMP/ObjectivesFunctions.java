@@ -88,7 +88,7 @@ public class ObjectivesFunctions {
         for (VirtualMachine vm : virtualMachines) {
 
             // Get violation per VM per time (if exists)
-            violation = DynamicVMP.getUnsatisfiedResources().get(vm.getId());
+            violation = DynamicVMP.UNSATISFIED_RESOURCES.get(vm.getId());
             if (violation != null && timeUnit != null) {
                 resources = violation.getResourcesViolated().get(timeUnit);
                 // Get Violated Resources
@@ -103,9 +103,9 @@ public class ObjectivesFunctions {
         }
 
         for (VirtualMachine dvm : derivedVMs) {
-            totalRevenue += dvm.getResources().get(0) * dvm.getRevenue().getCpu() * DynamicVMP.DERIVE_COST;
-            totalRevenue += dvm.getResources().get(1) * dvm.getRevenue().getRam() * DynamicVMP.DERIVE_COST;
-            totalRevenue += dvm.getResources().get(2) * dvm.getRevenue().getNet() * DynamicVMP.DERIVE_COST;
+            totalRevenue += dvm.getResources().get(0) * dvm.getRevenue().getCpu() * Parameter.DERIVE_COST;
+            totalRevenue += dvm.getResources().get(1) * dvm.getRevenue().getRam() * Parameter.DERIVE_COST;
+            totalRevenue += dvm.getResources().get(2) * dvm.getRevenue().getNet() * Parameter.DERIVE_COST;
         }
 
         return totalRevenue;
@@ -268,11 +268,11 @@ public class ObjectivesFunctions {
      */
     public static Float getScalarizationMethod(List<Float> objFunctValues, Float weight){
 
-        if("ED".equals(DynamicVMP.SCALARIZATION_METHOD)) {
+        if("ED".equals(Parameter.SCALARIZATION_METHOD)) {
             return getEuclideanDistance(objFunctValues);
-        } else if("CD".equals(DynamicVMP.SCALARIZATION_METHOD)) {
+        } else if("CD".equals(Parameter.SCALARIZATION_METHOD)) {
             return getChebyshevDistance(objFunctValues);
-        } else if("MD".equals(DynamicVMP.SCALARIZATION_METHOD)) {
+        } else if("MD".equals(Parameter.SCALARIZATION_METHOD)) {
             return getManhattanDistance(objFunctValues);
         } else {
             return getWeightedSum(objFunctValues, weight);
@@ -393,7 +393,7 @@ public class ObjectivesFunctions {
         objectiveFunctionsResult.add(revenueResult);
         objectiveFunctionsResult.add(wastedResourcesResult);
 
-        return ObjectivesFunctions.getScalarizationMethod(objectiveFunctionsResult, DynamicVMP.WEIGHT_ONLINE);
+        return ObjectivesFunctions.getScalarizationMethod(objectiveFunctionsResult, Constant.WEIGHT_ONLINE);
     }
 
     /**
@@ -404,7 +404,7 @@ public class ObjectivesFunctions {
      */
     public static Float[] loadObjectiveFunctions(List<VirtualMachine> virtualMachineList, List<VirtualMachine> derivedVMs, List<PhysicalMachine> physicalMachineList){
 
-		Float[] objectiveFunctions = new Float[DynamicVMP.NUM_OBJ_FUNCT_COMP];
+		Float[] objectiveFunctions = new Float[Constant.NUM_OBJ_FUNCT_COMP];
 
 	    objectiveFunctions[0]=ObjectivesFunctions.powerConsumption(physicalMachineList);
 	    objectiveFunctions[1]=ObjectivesFunctions.economicalRevenue(virtualMachineList,derivedVMs,null);

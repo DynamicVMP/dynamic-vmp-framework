@@ -228,13 +228,10 @@ public class Utils {
     }
 
     /**
-     * Load Data-Center
+     * Load DataCenter
      * <ul>
      *  <li>
      *      Load Physical Machine Configuration
-     *  </li>
-     *  <li>
-     *      Load Workload Trace
      *  </li>
      * </ul>
      * @param scenarioFile    List of Config Files
@@ -385,14 +382,14 @@ public class Utils {
         settings.setCrossoverProb(1.0);                                        // set the crossover operator probability
         settings.setNumberOfResources(3);                                      // set the number of resources
         settings.setNumberOfObjFunctions(4);                                   // set the number of objective functions
-        settings.setExecutionDuration(DynamicVMP.EXECUTION_DURATION);          // set the estimated duration of execution of the algorithm
-        settings.setExecutionInterval(DynamicVMP.INTERVAL_EXECUTION_MEMETIC);  // set the the interval of time to execute the algorithm
-        settings.setFaultTolerance(DynamicVMP.FAULT_TOLERANCE);                // set the flag to consider or not the fault tolerance constraint
+        settings.setExecutionDuration(Parameter.EXECUTION_DURATION);          // set the estimated duration of execution of the algorithm
+        settings.setExecutionInterval(Parameter.INTERVAL_EXECUTION_MEMETIC);  // set the the interval of time to execute the algorithm
+        settings.setFaultTolerance(Parameter.FAULT_TOLERANCE);                // set the flag to consider or not the fault tolerance constraint
         settings.setExecutionFirstTime(3);
 
         if (isFullMeme){
-            settings.setPopulationSize(DynamicVMP.POPULATION_SIZE);
-            settings.setNumberOfGenerations(DynamicVMP.NUMBER_GENERATIONS);
+            settings.setPopulationSize(Parameter.POPULATION_SIZE);
+            settings.setNumberOfGenerations(Parameter.NUMBER_GENERATIONS);
         }else{
             settings.setPopulationSize(10);
             settings.setNumberOfGenerations(10);
@@ -482,8 +479,8 @@ public class Utils {
         Integer timeEndMigrationSec;
 		Integer vmEndTimeMigration;
         for(VirtualMachine vm : migratedVirtualMachines){
-            timeEndMigrationSec = Math.round((vm.getResources().get(ResourcesEnum.RAM.getIndex())*byteToBitsFactor)/ DynamicVMP.LINK_CAPACITY);
-			vmEndTimeMigration = currentTimeUnit + secondsToTimeUnit(timeEndMigrationSec,DynamicVMP.TIMEUNIT_DURATION);
+            timeEndMigrationSec = Math.round((vm.getResources().get(ResourcesEnum.RAM.getIndex())*byteToBitsFactor)/ Parameter.LINK_CAPACITY);
+			vmEndTimeMigration = currentTimeUnit + secondsToTimeUnit(timeEndMigrationSec, Constant.TIMEUNIT_DURATION);
             timeEndMigrationList.add(vmEndTimeMigration);
         }
 		return timeEndMigrationList;
@@ -522,13 +519,13 @@ public class Utils {
 		APrioriValue aPrioriValue;
 		List<Float> normalizedValues = new ArrayList<>();
 		int iteratorObjFuncts;
-		for(iteratorObjFuncts = 0; iteratorObjFuncts < DynamicVMP.NUM_OBJ_FUNCT_COMP; iteratorObjFuncts++){
+		for(iteratorObjFuncts = 0; iteratorObjFuncts < Constant.NUM_OBJ_FUNCT_COMP; iteratorObjFuncts++){
 			aPrioriValue = aPrioriValuesList.get(iteratorObjFuncts);
 			normalizedValue = Utils.normalizeValue(objectiveFuntions[iteratorObjFuncts],aPrioriValue.getMinValue()
 					,aPrioriValue.getMaxValue());
 			normalizedValues.add(normalizedValue);
 		}
-		return ObjectivesFunctions.getScalarizationMethod(normalizedValues, DynamicVMP.WEIGHT_OFFLINE);
+		return ObjectivesFunctions.getScalarizationMethod(normalizedValues, Constant.WEIGHT_OFFLINE);
 	}
 
 
@@ -617,21 +614,21 @@ public class Utils {
     public static void loadParameter(ArrayList<String> scenariosFiles, Stream<String> stream) {
 
         List<String> parameter = stream.filter(s -> s.length() > 0).collect(Collectors.toList());
-        DynamicVMP.HEURISTIC_CODE = parameter.get(0);
-        DynamicVMP.PM_CONFIG = parameter.get(1);
+        Parameter.HEURISTIC_CODE = parameter.get(0);
+        Parameter.PM_CONFIG = parameter.get(1);
 
-        DynamicVMP.DERIVE_COST = new Float(parameter.get(2));
-        DynamicVMP.FAULT_TOLERANCE = Boolean.getBoolean(parameter.get(3));
-        DynamicVMP.PROTECTION_FACTOR = new Float(parameter.get(4));
-        DynamicVMP.INTERVAL_EXECUTION_MEMETIC = new Integer(parameter.get(5));
-        DynamicVMP.POPULATION_SIZE = new Integer(parameter.get(6));
-        DynamicVMP.NUMBER_GENERATIONS = new Integer(parameter.get(7));
-        DynamicVMP.EXECUTION_DURATION = new Integer(parameter.get(8));
-        DynamicVMP.LINK_CAPACITY = new Float(parameter.get(9));
-        DynamicVMP.MIGRATION_FACTOR_LOAD = new Float(parameter.get(10));
-	    DynamicVMP.HISTORICAL_DATA_SIZE = new Integer(parameter.get(11));
-	    DynamicVMP.FORECAST_SIZE = new Integer(parameter.get(12));
-        DynamicVMP.SCALARIZATION_METHOD = parameter.get(13);
+        Parameter.DERIVE_COST = new Float(parameter.get(2));
+        Parameter.FAULT_TOLERANCE = Boolean.getBoolean(parameter.get(3));
+        Parameter.PROTECTION_FACTOR = new Float(parameter.get(4));
+        Parameter.INTERVAL_EXECUTION_MEMETIC = new Integer(parameter.get(5));
+        Parameter.POPULATION_SIZE = new Integer(parameter.get(6));
+        Parameter.NUMBER_GENERATIONS = new Integer(parameter.get(7));
+        Parameter.EXECUTION_DURATION = new Integer(parameter.get(8));
+        Parameter.LINK_CAPACITY = new Float(parameter.get(9));
+        Parameter.MIGRATION_FACTOR_LOAD = new Float(parameter.get(10));
+        Parameter.HISTORICAL_DATA_SIZE = new Integer(parameter.get(11));
+        Parameter.FORECAST_SIZE = new Integer(parameter.get(12));
+        Parameter.SCALARIZATION_METHOD = parameter.get(13);
 
         for ( int i = 14; i < parameter.size(); i++ ) {
             scenariosFiles.add(parameter.get(i));

@@ -1,6 +1,5 @@
 package org.domain;
 
-import org.dynamicVMP.DynamicVMP;
 import org.dynamicVMP.ObjectivesFunctions;
 import org.dynamicVMP.Utils;
 

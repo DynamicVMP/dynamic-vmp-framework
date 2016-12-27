@@ -59,8 +59,6 @@ public class Heuristics {
      * @param virtualMachines      Virtual Machines
      * @param derivedVMs           List of Derived Virtual Machine
      * @param physicalMachines     List of Physical Machines
-     * @param faultTolerance       Flag that indicates if it is applying tolerance to failures
-     * @param protectionFactor     Flag that indicates the degree of Overbooking
      * @return <b>True</b>, if PM can host new Resources
      */
     public static Boolean updateVM(Scenario s, List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs,
@@ -74,7 +72,7 @@ public class Heuristics {
         // If Migration is active we add an MIGRATION_FACTOR_LOAD
         if(isMigrationActive) {
             utilization = new Resources(
-                    s.getUtilization().getCpu() + DynamicVMP.MIGRATION_FACTOR_LOAD,
+                    s.getUtilization().getCpu() + Parameter.MIGRATION_FACTOR_LOAD,
                     s.getUtilization().getRam(),
                     s.getUtilization().getNet());
         } else {
@@ -175,7 +173,7 @@ public class Heuristics {
         Violation violation = new Violation(timeViolation, res);
 
         DynamicVMP.updateEconomicalPenalties(vm,res);
-        DynamicVMP.getUnsatisfiedResources().put(vm.getId(), violation);
+        DynamicVMP.UNSATISFIED_RESOURCES.put(vm.getId(), violation);
     }
 
     /**

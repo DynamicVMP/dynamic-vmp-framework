@@ -10,8 +10,7 @@
 package org.dynamicVMP;
 
 import org.domain.*;
-import org.dynamicVMP.concurrent.StaticReconfMemeCall;
-import org.dynamicVMP.memeticAlgorithm.MASettings;
+import org.dynamicVMP.cleverReconfiguration.CleverReconfiguration;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,149 +24,25 @@ import java.util.stream.Stream;
 
 public class DynamicVMP {
 
-    // FILES
-    static final String POWER_CONSUMPTION_FILE = Utils.OUTPUT + "power_consumption";
-    static final String ECONOMICAL_REVENUE_FILE = Utils.OUTPUT + "economical_revenue";
-    static final String WASTED_RESOURCES_FILE = Utils.OUTPUT + "wasted_resources";
-    static final String WASTED_RESOURCES_RATIO_FILE = Utils.OUTPUT + "wasted_resources_ratio";
-    static final String SCENARIOS_SCORES = Utils.OUTPUT + "scenarios_scores";
-    static final String PLACEMENT_SCORE = Utils.OUTPUT + "resources_per_scenario";
-    static final String RECONFIGURATION_CALL_TIMES_FILE = Utils.OUTPUT + "reconfiguration_call_times";
-    static final String ECONOMICAL_PENALTIES_FILE = Utils.OUTPUT + "economical_penalties";
-    static final String LEASING_COSTS_FILE = Utils.OUTPUT + "leasing_costs";
+    public static final String DYNAMIC_VMP = "DynamicVMP";
 
-    // EXPERIMENTS PARAMETERS
+    static Integer TIME_SIMULATED;
+    static Integer INITIAL_TIME_UNIT;
+    static Integer VM_UNIQUE = 0;
 
     /**
-     * Heuristic Algorithm Code
+     * A priori Values
      */
-    static String HEURISTIC_CODE;
+    public static Float MAX_POWER = 0F;
+    public static Float MAX_REVENUE_LOST = 0F;
+    public static Float ECONOMICAL_PENALTIES = 0F;
+    public static Float LEASING_COSTS = 0F;
 
     /**
-     * Physical Machine Configuration
+     * Apriori values lists by time
      */
-    static String PM_CONFIG;
-
-    /**
-     * Penalty for derive VM
-     */
-    public static Float DERIVE_COST;
-
-    /**
-     * FAULT_TOLERANCE: Indicates if it is applying tolerance to failures.
-     * <ul>
-     *     <li>
-     *         <b>True</b>, VMs from same Service cannot be hosted in the same PM
-     *     </li>
-     *     <li>
-     *         <b>False</b>, VMs from same Service can be hosted in the same PM
-     *     </li>
-     * </ul>
-     *
-     */
-    public static Boolean FAULT_TOLERANCE;
-
-    /**
-     * Protection Factor:
-     * It can take values between 0 and 1,where
-     * <ul>
-     *     <li>
-     *         0 -> No overbooking
-     *     </li>
-     *     <li>
-     *         1 -> Full Overbooking (high risk of violation of SLA)
-     *     </li>
-     * </ul>
-     */
-    public static Float PROTECTION_FACTOR;
-
-    /**
-     * Interval Execution Memetic Algorithm
-     */
-    static Integer INTERVAL_EXECUTION_MEMETIC;
-
-    /**
-     * Population Size
-     */
-    static Integer POPULATION_SIZE;
-
-    /**
-     * Number of Generations
-     */
-    static Integer NUMBER_GENERATIONS;
-
-    /**
-     * Execution Duration
-     */
-    static Integer EXECUTION_DURATION;
-
-    /**
-     * Link Capacity in Gbps
-     */
-    static Float LINK_CAPACITY;
-
-    /**
-     * Percentage of overload when migration process is active
-     */
-    static Float MIGRATION_FACTOR_LOAD;
-
-    /**
-     * Time unit duration in seconds
-     */
-     static final Float TIMEUNIT_DURATION = 1F;
-
-    /**
-     * Number of Objective Functions
-     */
-    static final Integer NUM_OBJ_FUNCT_COMP = 3;
-
-    /**
-     * Historical objective functions values size
-     */
-    static Integer HISTORICAL_DATA_SIZE;
-
-    /**
-     * number of values ​​to predict
-     */
-    static Integer FORECAST_SIZE;
-
-    /**
-     * Weight for Weighted Sum (Online)
-     */
-    static Float WEIGHT_ONLINE = 0.33F;
-
-    /**
-     * Weight for Weighted Sum (Offline)
-     */
-    public static Float WEIGHT_OFFLINE = 0.25F;
-
-    /**
-     * Map of the Scalarization Method
-     * ED -> Euclidean Distance
-     * CD -> Chevyshev Distance
-     * MD -> Manhattan Distance
-     * WS -> Weighted Sum
-     */
-    static String SCALARIZATION_METHOD;
-
-    /**
-     * Map of the Heuristics Algorithm
-     * heuristicsMap.put("FF", 0);
-     * heuristicsMap.put("BF", 1);
-     * heuristicsMap.put("WF", 2);
-     * heuristicsMap.put("FFD", 3);
-     * heuristicsMap.put("BFD", 4);
-     */
-    static final Map<String, Integer> heuristicsMap = new HashMap<>();
-
-    public static Integer timeSimulated;
-    public static Integer initialTimeUnit;
-
-    public static final String BFD = "BFD";
-    public static final String FFD = "FFD";
-    public static final String BF = "BF";
-    public static final String FF = "FF";
-    public static final String WF = "WF";
+    static Map<Integer, Float> REVENUE_APRIORI_TIME = new HashMap<>();
+    static Map<Integer, Float> MIGRATED_MEMORY_APRIORI_TIME = new HashMap<>();
 
     /**
      *  Map <VM_ID, Violation> -> Violation per VM, per Time, per Resources
@@ -184,246 +59,10 @@ public class DynamicVMP {
      *      >
      * </pre>
      */
-    private static Map<Integer, Violation> unsatisfiedResources = new HashMap<>();
-
-    // Apriori values lists by time
-    static Map<Integer, Float> REVENUE_APRIORI_TIME = new HashMap<>();
-    static Float MAX_REVENUE_LOST = 0F;
-    static Map<Integer, Float> MIGRATED_MEMORY_APRIORI_TIME = new HashMap<>();
-    static Float MAX_POWER = 0F;
-    static Integer VM_UNIQUE = 0;
-
-    public static final String DYNAMIC_VMP = "DynamicVMP";
-
-    static Float ECONOMICAL_PENALTIES = 0F;
-    static Float LEASING_COSTS = 0F;
+    static Map<Integer, Violation> UNSATISFIED_RESOURCES = new HashMap<>();
 
     private DynamicVMP () {
         // Default Constructor
-    }
-
-    /**
-     * VMPManager
-     * @param workload Workload Trace
-     * @param physicalMachines List of Physical Machines
-     * @param virtualMachines List of Virtual Machines
-     * @param derivedVMs List of Derived Virtual Machines
-     * @param revenueByTime Revenue by time
-     * @param wastedResources WastedResources by time
-     * @param wastedResourcesRatioByTime WastedResourcesRatio per time
-     * @param powerByTime Power Consumption by time
-     * @param placements List of Placement by time
-     * @param code Heuristics Algorithm Code
-     * @param timeUnit Time init
-     * @param requestsProcess Type of Process
-     * @param maxPower Maximum Power Consumption
-     * @param realRevenue Revenue
-     *
-     * <b>RequestsProcess</b>:
-     *  <ul>
-     *      <li>Requests[0]: requestServed Number of requests served</li>
-     *      <li>Requests[1]: requestRejected Number of requests rejected</li>
-     *      <li>Requests[2]: requestUpdated Number of requests updated</li>
-     *      <li>Requests[3]: violation Number of violation</li>
-     *  </ul>
-     *
-     * @throws IOException
-     */
-    public static void VMPManager(List<Scenario> workload, List<PhysicalMachine> physicalMachines, List<VirtualMachine>
-            virtualMachines, List<VirtualMachine> derivedVMs,
-            Map<Integer, Float> revenueByTime, List<Resources> wastedResources,  Map<Integer, Float> wastedResourcesRatioByTime,
-            Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
-            Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
-            throws IOException, InterruptedException, ExecutionException {
-
-        List<APrioriValue> aPrioriValuesList = new ArrayList<>();
-        List<VirtualMachine> vmsToMigrate = new ArrayList<>();
-        List<Integer> vmsMigrationEndTimes = new ArrayList<>();
-        List<Float> valuesSelectedForecast = new ArrayList<>();
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        MASettings memeConfig = Utils.getMemeConfig(true);
-        Callable<Placement> staticReconfgTask;
-        Future<Placement> reconfgResult = null;
-        Placement reconfgPlacementResult = null;
-
-        Boolean isMigrationActive = false;
-	    Boolean isUpdateVmUtilization = false;
-        Boolean isReconfigurationActive = false;
-        Integer actualTimeUnit;
-        Integer nextTimeUnit;
-
-        Integer memeticTimeInit = -1;
-        Integer memeticTimeEnd=-1;
-
-        Integer migrationTimeInit=-1;
-        Integer migrationTimeEnd=-1;
-
-        Integer vmEndTimeMigration = 0;
-
-        for (int iterator = 0; iterator < workload.size(); ++iterator) {
-            Scenario request = workload.get(iterator);
-            actualTimeUnit = request.getTime();
-	        //check if is the last request, assign -1 to nextTimeUnit if so.
-            nextTimeUnit = iterator + 1 == workload.size() ? -1 : workload.get(iterator + 1).getTime();
-
-	        if (nextTimeUnit!= -1 && isMigrationActive && isVmBeingMigrated(request.getVirtualMachineID(),vmsToMigrate)){
-
-                // TODO: Check why this is null in some scenarios
-				VirtualMachine vmMigrating = VirtualMachine.getById(request.getVirtualMachineID(),virtualMachines);
-                if(vmMigrating != null) {
-                    vmEndTimeMigration = Utils.getEndTimeMigrationByVm(vmMigrating.getId(),vmsToMigrate,vmsMigrationEndTimes);
-                }
-
-                isUpdateVmUtilization = actualTimeUnit <= vmEndTimeMigration;
-            }
-
-            runHeuristics(request, code, physicalMachines, virtualMachines, derivedVMs, requestsProcess, isUpdateVmUtilization);
-
-            // check if its the last request or a variation of time unit will occurs.
-            if (nextTimeUnit == -1 || !actualTimeUnit.equals(nextTimeUnit)) {
-                ObjectivesFunctions.getObjectiveFunctionsByTime(physicalMachines,
-                    virtualMachines, derivedVMs, wastedResources,
-                    wastedResourcesRatioByTime, powerByTime, revenueByTime, timeUnit, actualTimeUnit);
-
-                Float placementScore = ObjectivesFunctions.getDistanceOrigenByTime(request.getTime(),
-                        maxPower, powerByTime, revenueByTime, wastedResourcesRatioByTime);
-
-                updateLeasingCosts(derivedVMs);
-
-                //        TODO: Only for debug
-                Utils.printToFile(scenarioFile, placementScore);
-
-                timeUnit = actualTimeUnit;
-
-                Placement heuristicPlacement = new Placement(PhysicalMachine.clonePMsList(physicalMachines),
-                        VirtualMachine.cloneVMsList(virtualMachines),
-                        VirtualMachine.cloneVMsList(derivedVMs), placementScore);
-                placements.put(actualTimeUnit, heuristicPlacement);
-
-                //check the historical information
-                if(nextTimeUnit!=-1 && placements.size()> HISTORICAL_DATA_SIZE &&
-                        !isReconfigurationActive && !isMigrationActive ){
-                    //collect O.F. historical values
-                    valuesSelectedForecast.clear();
-                    for(int timeIterator = nextTimeUnit- HISTORICAL_DATA_SIZE; timeIterator<=actualTimeUnit; timeIterator++){
-                        if(placements.get(timeIterator)!=null){
-                            valuesSelectedForecast.add(placements.get(timeIterator).getPlacementScore());
-                        }else{
-                            valuesSelectedForecast.add(0F);
-                        }
-                    }
-
-                    //check if a  call for reconfiguration is needed and set the init time
-                    if(Utils.callToReconfiguration(valuesSelectedForecast,FORECAST_SIZE)){
-                        Utils.printToFile(RECONFIGURATION_CALL_TIMES_FILE,nextTimeUnit);
-                        memeticTimeInit = nextTimeUnit;
-                        isReconfigurationActive=true;
-                    }else{
-                        memeticTimeInit=-1;
-                    }
-                }
-
-	            if(nextTimeUnit!=-1 && nextTimeUnit.equals(memeticTimeInit)){
-
-                    memeticTimeInit = nextTimeUnit;
-		            if(virtualMachines.size()!=0){
-			            // Clone the current placement
-			            Placement memeticPlacement = new Placement(PhysicalMachine.clonePMsList(physicalMachines),
-					            VirtualMachine.cloneVMsList(virtualMachines),
-					            VirtualMachine.cloneVMsList(derivedVMs));
-
-			            //get the list of a priori values
-			            aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
-			            //config the call for the memetic algorithm
-			            staticReconfgTask = new StaticReconfMemeCall(memeticPlacement,aPrioriValuesList,
-					            memeConfig);
-			            //call the memetic algorithm in a separate thread
-			            reconfgResult = executorService.submit(staticReconfgTask);
-			            //update the time end of the memetic algorithm execution
-			            memeticTimeEnd = memeticTimeInit + memeConfig.getExecutionDuration();
-			            //update the migration init time
-			            migrationTimeInit = memeticTimeEnd+1;
-
-		            }else{
-			            migrationTimeInit += 1;
-		            }
-
-
-	            }else if(nextTimeUnit != -1 && nextTimeUnit.equals(migrationTimeInit)) {
-                    isMigrationActive = true;
-		            try {
-
-                        if(reconfgResult != null) {
-                            //get the placement from the memetic algorithm execution
-                            reconfgPlacementResult = reconfgResult.get();
-                            //get vms to migrate
-                            vmsToMigrate  = Utils.getVMsToMigrate(reconfgPlacementResult.getVirtualMachineList(),
-		                            placements.get(memeticTimeInit - 1).getVirtualMachineList());
-	                        //update de virtual machine list of the placement for the migration operation
-	                        Utils.removeDeadVMsFromPlacement(reconfgPlacementResult,actualTimeUnit,memeConfig.getNumberOfResources());
-                            //update de virtual machines migrated
-                            Utils.removeDeadVMsMigrated(vmsToMigrate,actualTimeUnit);
-                            //update the placement score after filtering dead  virtual machines.
-                            reconfgPlacementResult.updatePlacementScore(aPrioriValuesList);
-                            //get end time of vms migrations
-                            vmsMigrationEndTimes = Utils.getTimeEndMigrationByVM(vmsToMigrate, actualTimeUnit);
-                            //update migration end
-                            migrationTimeEnd = Utils.getMigrationEndTime(vmsMigrationEndTimes);
-
-                        }
-		            } catch (ExecutionException e) {
-			            Logger.getLogger(DYNAMIC_VMP).log(Level.SEVERE, "Migration Failed!");
-                        throw e;
-		            }
-
-	            } else if(nextTimeUnit != -1 && actualTimeUnit.equals(migrationTimeEnd)) {
-					/* get here the new virtual machines to insert in the placement generated by the
-		            memetic algorithm using Best Fit Decreasing */
-                    isMigrationActive = false;
-                    isReconfigurationActive = false;
-
-                    //update de virtual machine list of the placement after the migration operation
-                    Utils.removeDeadVMsFromPlacement(reconfgPlacementResult,actualTimeUnit,memeConfig.getNumberOfResources());
-		            //update the placement score after filtering dead  virtual machines.
-		            reconfgPlacementResult.updatePlacementScore(aPrioriValuesList);
-
-                    Placement memeticPlacement = updatePlacementAfterReconf(workload, BFD, reconfgPlacementResult, memeticTimeInit,
-                            migrationTimeEnd);
-
-                    if(isMememeticPlacementBetter(placements.get(actualTimeUnit), memeticPlacement)) {
-                        physicalMachines = new ArrayList<>(memeticPlacement.getPhysicalMachines());
-                        virtualMachines = new ArrayList<>(memeticPlacement.getVirtualMachineList());
-                        derivedVMs = new ArrayList<>(memeticPlacement.getDerivedVMs());
-                    }
-	            }
-            }
-        }
-        Float scenarioScored = ObjectivesFunctions.getScenarioScore(revenueByTime, placements, realRevenue);
-
-//        TODO: Only for debug
-//        System.out.println("************************RESULTS*************************");
-//        System.out.println("Simulated time\t\t\t\t: \t" + timeSimulated);
-//        System.out.println("Unique Virtual Machine\t\t: \t" + DynamicVMP.VM_UNIQUE );
-//        System.out.println("Scenario Score\t\t\t\t: \t" + scenarioScored );
-//        System.out.println("Max revenue lost (possible)\t: \t" + MAX_REVENUE_LOST);
-//        System.out.println("Real revenue lost\t\t\t: \t" + realRevenue[0]);
-//        System.out.println("Request Updated\t\t\t\t: \t" + requestsProcess[2]);
-//        System.out.println("Request Violation\t\t\t: \t" + requestsProcess[3]);
-//        System.out.println("Request Rejected(VM Derived)\t: \t" + requestsProcess[1]);
-//        System.out.println("Request Serviced(VM Allocated)\t: \t" + requestsProcess[0]);
-//        System.out.println("********************************************************\n");
-
-        Utils.printToFile(POWER_CONSUMPTION_FILE, Utils.getAvgPwConsumptionNormalized(powerByTime));
-        Utils.printToFile(WASTED_RESOURCES_FILE, Utils.getAvgResourcesWNormalized(wastedResourcesRatioByTime));
-        Utils.printToFile(ECONOMICAL_REVENUE_FILE, Utils.getAvgRevenueNormalized(revenueByTime));
-        Utils.printToFile(WASTED_RESOURCES_RATIO_FILE, wastedResources);
-        Utils.printToFile(SCENARIOS_SCORES, scenarioScored);
-        Utils.printToFile(RECONFIGURATION_CALL_TIMES_FILE,"\n");
-        Utils.printToFile(ECONOMICAL_PENALTIES_FILE, ECONOMICAL_PENALTIES);
-        Utils.printToFile(LEASING_COSTS_FILE,LEASING_COSTS);
-
-        Utils.executorServiceTermination(executorService);
     }
 
     /**
@@ -481,7 +120,7 @@ public class DynamicVMP {
     public static Placement updatePlacementAfterReconf (List<Scenario> workload, String heuristicCode, Placement placement,
             Integer startTimeMemeticAlg, Integer endTimeMemeticAlg) {
 
-        Integer code = heuristicsMap.get(heuristicCode);
+        Integer code = Constant.HEURISTIC_MAP.get(heuristicCode);
         Integer[] requestsProcessAfterReconf = initRequestProcess();
 
         // List of missed requests by Memetic Algorithm order by Revenue (excepts removed VM)
@@ -522,13 +161,12 @@ public class DynamicVMP {
         ArrayList<String> scenariosFiles  = new ArrayList<>();
         loadParameters(scenariosFiles, args[0]);
 
-        initHeuristicMap();
         Logger.getLogger(DYNAMIC_VMP).log(Level.INFO, "STARTING EXPERIMENTS");
 
         for (String scenarioFile : scenariosFiles) {
             // TODO: For debug only
             System.out.println(scenarioFile);
-            launchExperiments(HEURISTIC_CODE, PM_CONFIG, scenarioFile);
+            launchExperiments(Parameter.HEURISTIC_CODE, Parameter.PM_CONFIG, scenarioFile);
         }
         Logger.getLogger(DYNAMIC_VMP).log(Level.INFO, "ENDING EXPERIMENTS");
 
@@ -578,21 +216,21 @@ public class DynamicVMP {
         Map<Integer, Placement> placements = new HashMap<>();
 
         MAX_POWER = Utils.loadDatacenter(pmConfig, scenarioFile, physicalMachines, scenarios);
-        timeSimulated = scenarios.get(scenarios.size() - 1).getTime();
-        Integer code = heuristicsMap.get(heuristicCode);
+        TIME_SIMULATED = scenarios.get(scenarios.size() - 1).getTime();
+        Integer code = Constant.HEURISTIC_MAP.get(heuristicCode);
 
         Integer timeUnit = scenarios.get(0).getTime();
-        initialTimeUnit = timeUnit;
+        INITIAL_TIME_UNIT = timeUnit;
         timeAdjustment(wastedResources, wastedResourcesRatioByTime, powerByTime, revenueByTime, scenarioFile);
 
         loadAprioriValuesByTime(scenarios);
 
         // Prepare scenario for Decreasing Algorithms (Sort by Total Revenue)
-        if (BFD.equals(heuristicCode) || FFD.equals(heuristicCode)) {
+        if (Constant.BFD.equals(heuristicCode) || Constant.FFD.equals(heuristicCode)) {
             Collections.sort(scenarios);
         }
 
-        VMPManager(scenarios, physicalMachines, virtualMachines, derivedVMs,
+        CleverReconfiguration.CleverReconfigurationgManager(scenarios, physicalMachines, virtualMachines, derivedVMs,
                 revenueByTime, wastedResources, wastedResourcesRatioByTime, powerByTime,
                 placements, code, timeUnit, requestsProcess, MAX_POWER, realRevenue, scenarioFile
         );
@@ -609,15 +247,15 @@ public class DynamicVMP {
             Map<Integer, Float> revenueByTime, String scenarioFile) throws IOException {
 
         Integer timeAdjust = 0;
-        if(initialTimeUnit != 0 ) {
-            while (timeAdjust < initialTimeUnit) {
+        if(INITIAL_TIME_UNIT  != 0 ) {
+            while (timeAdjust < INITIAL_TIME_UNIT) {
                 powerByTime.put(timeAdjust, 0F);
                 wastedResources.add(new Resources());
                 wastedResourcesRatioByTime.put(timeAdjust, 0F);
                 revenueByTime.put(timeAdjust, 0F);
                 Utils.printToFile(scenarioFile, 0);
                 timeAdjust++;
-                timeSimulated += 1;
+                TIME_SIMULATED  += 1;
             }
         }
     }
@@ -626,18 +264,17 @@ public class DynamicVMP {
      * Load the objective function's  a priori values from the scenario
      * @param workload List of Scenarios
      */
-    public static void loadAprioriValuesByTime(List<Scenario> workload){
+    public static void loadAprioriValuesByTime(List<Scenario> workload) {
 
         Map<Integer, Float> revenueAPrioriByTime = new HashMap<>();
         Map<Integer, Float> migratedMemoryAPrioriByTime = new HashMap<>();
-        MAX_REVENUE_LOST = 0F;
         Integer numberUniqueVm = 0;
         Float revenueAPriori=0F;
         Float migratedMemoryAPriori = 0F;
         Integer timeAdjust = 0;
 
-        if(initialTimeUnit != 0 ) {
-            while (timeAdjust < initialTimeUnit) {
+        if(INITIAL_TIME_UNIT  != 0 ) {
+            while (timeAdjust < INITIAL_TIME_UNIT ) {
                 revenueAPrioriByTime.put(timeAdjust, 0F);
                 migratedMemoryAPrioriByTime.put(timeAdjust, 0F);
                 timeAdjust++;
@@ -678,7 +315,7 @@ public class DynamicVMP {
      * @param memeticPlacement Memetic Placement
      * @return <b>True</b>, is Memetic Placement is better than Heuristic Placement <br> <b>False</b>, otherwise
      */
-    private static Boolean isMememeticPlacementBetter(Placement heuristicPlacement, Placement memeticPlacement) {
+    public static Boolean isMememeticPlacementBetter(Placement heuristicPlacement, Placement memeticPlacement) {
 
         Boolean isBetter = false;
         if(memeticPlacement == null) {
@@ -715,24 +352,7 @@ public class DynamicVMP {
         return requestsProcess;
     }
 
-    private static void initHeuristicMap() {
-        heuristicsMap.put("FF", 0);
-        heuristicsMap.put("BF", 1);
-        heuristicsMap.put("WF", 2);
-        heuristicsMap.put("FFD", 3);
-        heuristicsMap.put("BFD", 4);
-    }
-
-    /**
-     *
-     * @return Unsatisfied Resources
-     */
-    public static Map<Integer, Violation> getUnsatisfiedResources() {
-
-        return unsatisfiedResources;
-    }
-
-    public static Boolean isVmBeingMigrated(Integer virtualMachineId, List<VirtualMachine> vmsToMigrate){
+    public static Boolean isVmBeingMigrated(Integer virtualMachineId, List<VirtualMachine> vmsToMigrate) {
 		Integer iteratorVM;
 	    VirtualMachine vmMigrated;
 	    for(iteratorVM=0;iteratorVM<vmsToMigrate.size();iteratorVM++){
@@ -744,7 +364,7 @@ public class DynamicVMP {
 		return false;
     }
 
-    public static void updateEconomicalPenalties(VirtualMachine vm, Resources resourcesViolated){
+    public static void updateEconomicalPenalties(VirtualMachine vm, Resources resourcesViolated) {
 
         Float violationRevenue = 0F;
         violationRevenue += resourcesViolated.getCpu() * vm.getRevenue().getCpu();
@@ -754,13 +374,13 @@ public class DynamicVMP {
         ECONOMICAL_PENALTIES += violationRevenue;
     }
 
-    public static void updateLeasingCosts(List<VirtualMachine> derivedVMs){
+    public static void updateLeasingCosts(List<VirtualMachine> derivedVMs) {
 
         Float leasingCostRevenue = 0F;
         for (VirtualMachine dvm : derivedVMs) {
-            leasingCostRevenue += dvm.getResources().get(0) * dvm.getRevenue().getCpu() * DynamicVMP.DERIVE_COST;
-            leasingCostRevenue += dvm.getResources().get(1) * dvm.getRevenue().getRam() * DynamicVMP.DERIVE_COST;
-            leasingCostRevenue += dvm.getResources().get(2) * dvm.getRevenue().getNet() * DynamicVMP.DERIVE_COST;
+            leasingCostRevenue += dvm.getResources().get(0) * dvm.getRevenue().getCpu() * Parameter.DERIVE_COST;
+            leasingCostRevenue += dvm.getResources().get(1) * dvm.getRevenue().getRam() * Parameter.DERIVE_COST;
+            leasingCostRevenue += dvm.getResources().get(2) * dvm.getRevenue().getNet() * Parameter.DERIVE_COST;
         }
 
         LEASING_COSTS+= leasingCostRevenue;

@@ -2,8 +2,6 @@ package org.dynamicVMP.memeticAlgorithm;
 
 import org.dynamicVMP.Utils;
 
-import javax.rmi.CORBA.Util;
-
 /**
  * @author Leonardo Benitez.
  */

@@ -4,9 +4,9 @@ import org.domain.PhysicalMachine;
 import org.domain.VirtualMachine;
 import org.dynamicVMP.Constraints;
 import org.dynamicVMP.DynamicVMP;
+import org.dynamicVMP.Parameter;
 import org.dynamicVMP.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,7 +57,7 @@ public class Reparation {
                pm = PhysicalMachine.getById(physicalMachineId,individualPmList);
                vmsInPM = Utils.filterVMsByPM(individualVmList,physicalMachineId);
                vm = individualVmList.get(iteratorSolution);
-               if(Constraints.checkPMOverloaded(pm,vmsInPM, DynamicVMP.PROTECTION_FACTOR)){
+               if(Constraints.checkPMOverloaded(pm,vmsInPM, Parameter.PROTECTION_FACTOR)){
                   moveVM(individual,iteratorSolution,vm,individualVmList,individualPmList,numberOfResources);
                }
            }
