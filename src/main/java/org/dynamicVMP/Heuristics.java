@@ -108,9 +108,9 @@ public class Heuristics {
         }
 
         for(VirtualMachine derivedVM : derivedVMs){
-            if(derivedVM.getId().equals(updatedVM.getId())){
+            if(updatedVM.equals(derivedVM)) {
+                updateVmResources(derivedVMs, updatedVM);
                 success=true;
-                break;
             }
         }
         return success;
@@ -172,7 +172,7 @@ public class Heuristics {
         Resources res = new Resources(cpuViolation, ramViolation, netViolation);
         Violation violation = new Violation(timeViolation, res);
 
-        DynamicVMP.updateEconomicalPenalties(vm,res);
+        DynamicVMP.updateEconomicalPenalties(vm,res, timeViolation);
         DynamicVMP.UNSATISFIED_RESOURCES.put(vm.getId(), violation);
     }
 
@@ -189,6 +189,7 @@ public class Heuristics {
             if (vm.equals(updatedVM)) {
                 vm.setUtilization(updatedVM.getUtilization());
                 vm.setResources(updatedVM.getResources());
+                vm.setRevenue(updatedVM.getRevenue());
             }
         });
     }

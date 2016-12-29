@@ -284,9 +284,9 @@ public class DynamicVMP {
         for( int iteratroScenario=0; iteratroScenario<workload.size(); iteratroScenario++){
 
             Scenario request = workload.get(iteratroScenario);
-            revenueAPriori += request.getRevenue().getCpu() * request.getResources().getCpu();
-            revenueAPriori += request.getRevenue().getRam() * request.getResources().getRam();
-            revenueAPriori += request.getRevenue().getNet() * request.getResources().getNet();
+            revenueAPriori += request.getRevenue().getCpu() * request.getResources().getCpu() *  Parameter.DERIVE_COST;
+            revenueAPriori += request.getRevenue().getRam() * request.getResources().getRam() *  Parameter.DERIVE_COST;
+            revenueAPriori += request.getRevenue().getNet() * request.getResources().getNet() *  Parameter.DERIVE_COST;
 
 	        migratedMemoryAPriori+= request.getResources().getRam();
 
@@ -364,12 +364,16 @@ public class DynamicVMP {
 		return false;
     }
 
-    public static void updateEconomicalPenalties(VirtualMachine vm, Resources resourcesViolated) {
+    public static void updateEconomicalPenalties(VirtualMachine vm, Resources resourcesViolated, Integer timeViolation) {
 
         Float violationRevenue = 0F;
         violationRevenue += resourcesViolated.getCpu() * vm.getRevenue().getCpu();
         violationRevenue += resourcesViolated.getRam() * vm.getRevenue().getRam();
         violationRevenue += resourcesViolated.getNet() * vm.getRevenue().getNet();
+
+        Float currentRevenue = DynamicVMP.REVENUE_APRIORI_TIME.get(timeViolation);
+        Float newAPrioriRevenue = currentRevenue + violationRevenue;
+        DynamicVMP.REVENUE_APRIORI_TIME.put(timeViolation, newAPrioriRevenue);
 
         ECONOMICAL_PENALTIES += violationRevenue;
     }
