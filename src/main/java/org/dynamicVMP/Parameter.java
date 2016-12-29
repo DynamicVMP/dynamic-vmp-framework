@@ -105,4 +105,12 @@ public class Parameter {
      */
     static String SCALARIZATION_METHOD;
 
+    /**
+     * Type of Algorithm
+     * 0 -> State of Art
+     * 1 -> Beloglazob Approach
+     * 2 -> Periodic Reconfiguration
+     * 3 -> Clever Reconfiguration
+     */
+    public static Integer ALGORITHM;
 }

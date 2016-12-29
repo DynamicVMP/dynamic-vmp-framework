@@ -84,8 +84,8 @@ public class DynamicVMP {
      * List of Heuristics Algorithms
      */
     private static Algorithm[] algorithms = new Algorithm[] {
-            CleverReconfiguration::cleverReconfigurationgManager,
-            StateOfArt::stateOfArtManager,
+            StateOfArt::stateOfArtManager,                          // Alg0
+            CleverReconfiguration::cleverReconfigurationgManager,   // Alg4
     };
 
     /**
@@ -253,8 +253,7 @@ public class DynamicVMP {
             Collections.sort(scenarios);
         }
 
-
-        getAlgorithms()[1]
+        getAlgorithms()[Parameter.ALGORITHM]
                 .useAlgorithm(scenarios, physicalMachines, virtualMachines, derivedVMs,
                         revenueByTime, wastedResources, wastedResourcesRatioByTime, powerByTime,
                         placements, code, timeUnit, requestsProcess, MAX_POWER, realRevenue, scenarioFile);

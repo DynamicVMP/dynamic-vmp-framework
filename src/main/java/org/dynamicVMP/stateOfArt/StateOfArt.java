@@ -29,6 +29,8 @@ public class StateOfArt {
             Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
             throws IOException, InterruptedException, ExecutionException {
 
+        System.out.println(DYNAMIC_VMP_STATE_OF_ART);
+
         List<APrioriValue> aPrioriValuesList = new ArrayList<>();
         List<VirtualMachine> vmsToMigrate = new ArrayList<>();
         List<Integer> vmsMigrationEndTimes = new ArrayList<>();

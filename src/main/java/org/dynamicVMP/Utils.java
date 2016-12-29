@@ -13,16 +13,20 @@ import org.domain.*;
 import org.dynamicVMP.enums.ResourcesEnum;
 import org.dynamicVMP.memeticAlgorithm.MASettings;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -614,25 +618,33 @@ public class Utils {
     public static void loadParameter(ArrayList<String> scenariosFiles, Stream<String> stream) {
 
         List<String> parameter = stream.filter(s -> s.length() > 0).collect(Collectors.toList());
-        Parameter.HEURISTIC_CODE = parameter.get(0);
-        Parameter.PM_CONFIG = parameter.get(1);
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameter.stream()
+                 .filter(line -> line.split("=").length > 1)
+                 .forEach(line ->
+            ((HashMap) parameterMap).put(line.split("=")[0], line.split("=")[1])
+        );
 
-        Parameter.DERIVE_COST = new Float(parameter.get(2));
-        Parameter.FAULT_TOLERANCE = Boolean.getBoolean(parameter.get(3));
-        Parameter.PROTECTION_FACTOR = new Float(parameter.get(4));
-        Parameter.INTERVAL_EXECUTION_MEMETIC = new Integer(parameter.get(5));
-        Parameter.POPULATION_SIZE = new Integer(parameter.get(6));
-        Parameter.NUMBER_GENERATIONS = new Integer(parameter.get(7));
-        Parameter.EXECUTION_DURATION = new Integer(parameter.get(8));
-        Parameter.LINK_CAPACITY = new Float(parameter.get(9));
-        Parameter.MIGRATION_FACTOR_LOAD = new Float(parameter.get(10));
-        Parameter.HISTORICAL_DATA_SIZE = new Integer(parameter.get(11));
-        Parameter.FORECAST_SIZE = new Integer(parameter.get(12));
-        Parameter.SCALARIZATION_METHOD = parameter.get(13);
+        Parameter.ALGORITHM = Integer.parseInt( (String) parameterMap.get("ALGORITHM"));
+        Parameter.HEURISTIC_CODE = (String) parameterMap.get("HEURISTIC_CODE");
+        Parameter.PM_CONFIG = (String) parameterMap.get("PM_CONFIG");
+        Parameter.DERIVE_COST = new Float ((String) parameterMap.get("DERIVE_COST"));
+        Parameter.FAULT_TOLERANCE = Boolean.getBoolean( (String) parameterMap.get("FAULT_TOLERANCE"));
+        Parameter.PROTECTION_FACTOR =   new Float ((String) parameterMap.get("PROTECTION_FACTOR"));
+        Parameter.INTERVAL_EXECUTION_MEMETIC = Integer.parseInt( (String) parameterMap.get
+                ("INTERVAL_EXECUTION_MEMETIC"));
+        Parameter.POPULATION_SIZE = Integer.parseInt( (String) parameterMap.get("POPULATION_SIZE"));
+        Parameter.NUMBER_GENERATIONS = Integer.parseInt( (String) parameterMap.get("NUMBER_GENERATIONS"));
+        Parameter.EXECUTION_DURATION = Integer.parseInt( (String) parameterMap.get("EXECUTION_DURATION"));
+        Parameter.LINK_CAPACITY =  new Float ((String) parameterMap.get("LINK_CAPACITY"));
+        Parameter.MIGRATION_FACTOR_LOAD =  new Float ((String) parameterMap.get("MIGRATION_FACTOR_LOAD"));
+        Parameter.HISTORICAL_DATA_SIZE = Integer.parseInt( (String) parameterMap.get("HISTORICAL_DATA_SIZE"));
+        Parameter.FORECAST_SIZE =Integer.parseInt( (String)  parameterMap.get("FORECAST_SIZE"));
+        Parameter.SCALARIZATION_METHOD = (String) parameterMap.get("SCALARIZATION_METHOD");
 
-        for ( int i = 14; i < parameter.size(); i++ ) {
-            scenariosFiles.add(parameter.get(i));
-        }
+        parameter.stream()
+                 .filter(line -> line.split("=").length == 1 && !line.equals("SCENARIOS"))
+                 .forEach(scenariosFiles::add);
     }
 
 
