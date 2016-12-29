@@ -11,6 +11,7 @@ package org.dynamicVMP;
 
 import org.domain.*;
 import org.dynamicVMP.cleverReconfiguration.CleverReconfiguration;
+import org.dynamicVMP.stateOfArt.StateOfArt;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -66,6 +67,28 @@ public class DynamicVMP {
     }
 
     /**
+     * Algorithm Interface
+     */
+    @FunctionalInterface
+    interface Algorithm {
+        void useAlgorithm(List<Scenario> workload, List<PhysicalMachine> physicalMachines,
+                List<VirtualMachine>
+                        virtualMachines, List<VirtualMachine> derivedVMs,
+                Map<Integer, Float> revenueByTime, List<Resources> wastedResources,  Map<Integer, Float> wastedResourcesRatioByTime,
+                Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
+                Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
+                throws IOException, InterruptedException, ExecutionException;
+    }
+
+    /**
+     * List of Heuristics Algorithms
+     */
+    private static Algorithm[] algorithms = new Algorithm[] {
+            CleverReconfiguration::cleverReconfigurationgManager,
+            StateOfArt::stateOfArtManager,
+    };
+
+    /**
      *
      * @param s One request of Workload Scenario
      * @param code Heuristics Code
@@ -86,8 +109,8 @@ public class DynamicVMP {
 
         // If current_time is equals to VM tinit, allocated VM
         if (s.getTime() <= s.getTinit()) {
-            if (Heuristics.getAlgorithms()[code]
-                    .useAlgorithm(s, physicalMachines, virtualMachines, derivedVMs)) {
+            if (Heuristics.getHeuristics()[code]
+                    .useHeuristic(s, physicalMachines, virtualMachines, derivedVMs)) {
                 requests[0]++;
             } else {
                 // Derive Virtual Machine
@@ -230,10 +253,11 @@ public class DynamicVMP {
             Collections.sort(scenarios);
         }
 
-        CleverReconfiguration.CleverReconfigurationgManager(scenarios, physicalMachines, virtualMachines, derivedVMs,
-                revenueByTime, wastedResources, wastedResourcesRatioByTime, powerByTime,
-                placements, code, timeUnit, requestsProcess, MAX_POWER, realRevenue, scenarioFile
-        );
+
+        getAlgorithms()[1]
+                .useAlgorithm(scenarios, physicalMachines, virtualMachines, derivedVMs,
+                        revenueByTime, wastedResources, wastedResourcesRatioByTime, powerByTime,
+                        placements, code, timeUnit, requestsProcess, MAX_POWER, realRevenue, scenarioFile);
     }
 
     /**
@@ -390,5 +414,14 @@ public class DynamicVMP {
         LEASING_COSTS+= leasingCostRevenue;
     }
 
+    public static Algorithm[] getAlgorithms() {
+
+        return algorithms;
+    }
+
+    public static void setAlgorithms(final Algorithm[] algorithms) {
+
+        DynamicVMP.algorithms = algorithms;
+    }
 }
 

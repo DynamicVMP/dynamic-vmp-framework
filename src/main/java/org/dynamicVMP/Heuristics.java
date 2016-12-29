@@ -28,14 +28,14 @@ public class Heuristics {
      */
     @FunctionalInterface
     interface Algorithm {
-        Boolean useAlgorithm(Scenario s, List<PhysicalMachine> physicalMachines,
+        Boolean useHeuristic(Scenario s, List<PhysicalMachine> physicalMachines,
                 List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs);
     }
 
     /**
      * List of Heuristics Algorithms
      */
-    private static Algorithm[] algorithms = new Algorithm[] {
+    private static Algorithm[] heuristics = new Algorithm[] {
             Heuristics::firstFit,
             Heuristics::bestFit,
             Heuristics::worstFit,
@@ -47,8 +47,8 @@ public class Heuristics {
      *
      * @return Array of Pointers to Function
      */
-    public static Algorithm[] getAlgorithms() {
-        return algorithms;
+    public static Algorithm[] getHeuristics() {
+        return heuristics;
     }
 
 
