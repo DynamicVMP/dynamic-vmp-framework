@@ -11,6 +11,7 @@ package org.framework;
 
 import org.domain.*;
 import org.framework.cleverReconfiguration.CleverReconfiguration;
+import org.framework.periodicMigration.PeriodicMigration;
 import org.framework.stateOfArt.StateOfArt;
 import org.framework.thresholdBasedApproach.ThresholdBasedApproach;
 
@@ -84,11 +85,15 @@ public class DynamicVMP {
     /**
      * List of Heuristics Algorithms
      */
-    private static Algorithm[] algorithms = new Algorithm[] {
-            StateOfArt::stateOfArtManager,                          // Alg0
-            ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg1
-            CleverReconfiguration::cleverReconfigurationgManager,   // Alg3
-    };
+    private static Algorithm[] algorithms;
+    static {
+        algorithms = new Algorithm[]{
+                StateOfArt::stateOfArtManager,                          // Alg0
+                PeriodicMigration::periodicMigrationManager,            // Alg1
+                ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg2
+                CleverReconfiguration::cleverReconfigurationgManager,   // Alg3
+        };
+    }
 
     /**
      * @param s                One request of Workload Scenario

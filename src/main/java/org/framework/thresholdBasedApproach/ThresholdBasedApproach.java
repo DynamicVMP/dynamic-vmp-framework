@@ -17,6 +17,8 @@ import java.util.concurrent.Executors;
  */
 public class ThresholdBasedApproach {
 
+    public static final String DYNAMIC_VMP_THRESHOLD_BASED = "DynamicVMP: Threshold Based";
+
     /**
      * VMPManager
      * @param workload Workload Trace
@@ -51,6 +53,8 @@ public class ThresholdBasedApproach {
             Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
             Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
             throws IOException, InterruptedException, ExecutionException {
+
+        System.out.println(DYNAMIC_VMP_THRESHOLD_BASED);
 
         List<VirtualMachine> vmsToMigrateFromPM = new ArrayList<>();
         List<VirtualMachine> vmsToMigrate = new ArrayList<>();

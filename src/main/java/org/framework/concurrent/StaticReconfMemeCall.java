@@ -29,3 +29,4 @@ public class StaticReconfMemeCall implements Callable<Placement>{
         return memetic.reconfiguration(actualPlacement,aPrioriValuesList,settings);
     }
 }
+
