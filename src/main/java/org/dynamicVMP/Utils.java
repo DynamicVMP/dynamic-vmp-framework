@@ -649,39 +649,40 @@ public class Utils {
 
 
 	/**
-	 *
-	 * @param series
-	 * @param alpha
-	 * @param beta
-	 * @param nForecast
-	 * @return
+	 * Forecast n values for n periods ahead using double exponential smoothing
+	 * @param series : know values
+	 * @param alpha : smoothing factor
+	 * @param beta : trend factor
+	 * @param nForecast: number of values to forecast
+	 * @return values forecasted
 	 */
 	public static List<Float>  doubleExponentialSmooth(List<Float> series, Float alpha, Float beta, Integer nForecast){
 		List<Float> result = new ArrayList<>();
 		Float level = 0F;
 		Float trend = 0F;
-		Float lastLevel,value;
-		Integer lastIndex;
+		Float lastLevel=0F,lastTrend=0F,value=0F;
 
 		result.add(series.get(0));
-		for(int iterator=1;iterator<series.size() + nForecast; iterator++){
+		for(int iterator=1;iterator<series.size(); iterator++){
 			if(iterator==1){
 				level = series.get(0);
 				trend = series.get(1)-series.get(0);
 			}
-			if(iterator >= series.size()) {
-				//forecasting
-				lastIndex = result.size() - 1;
-				value = result.get(lastIndex);
-			}else{
-				value = series.get(iterator);
-			}
 
+			value = series.get(iterator);
 			lastLevel = level;
 			level = alpha*value + (1-alpha)*(level + trend);
+			lastTrend = trend;
 			trend = beta*(level - lastLevel) + (1-beta)*trend;
-			result.add(level+trend);
+			result.add(lastLevel+lastTrend);
 		}
+		//forecasting
+		lastLevel = level;
+		lastTrend = trend;
+		for(int n=1;n<=nForecast;n++){
+			result.add(lastLevel + n*lastTrend);
+		}
+
 		return result;
 	}
 
