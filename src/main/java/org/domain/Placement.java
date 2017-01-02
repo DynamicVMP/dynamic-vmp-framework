@@ -1,7 +1,7 @@
 package org.domain;
 
-import org.dynamicVMP.ObjectivesFunctions;
-import org.dynamicVMP.Utils;
+import org.framework.ObjectivesFunctions;
+import org.framework.Utils;
 
 import java.util.List;
 

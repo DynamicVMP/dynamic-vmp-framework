@@ -1,6 +1,6 @@
 package org.domain;
 
-import org.dynamicVMP.Utils;
+import org.framework.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -233,6 +233,19 @@ public class PhysicalMachine {
             clonePM.add((PhysicalMachine) pm.clonePM()));
 
         return clonePM;
+    }
+
+    /**
+     * @param vm              Virtual Machine
+     * @param operation       Operation
+     */
+    public void updatePMResources(VirtualMachine vm, String operation) {
+
+        for (int k = 0; k < this.getResources().size(); k++) {
+            this.updateResource(k, vm.getResources().get(k) * vm.getUtilization().get(k) / 100,
+                    operation);
+        }
+        this.updateUtilization();
     }
 
 }

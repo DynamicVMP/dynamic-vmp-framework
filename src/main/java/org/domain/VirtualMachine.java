@@ -1,6 +1,6 @@
 package org.domain;
 
-import org.dynamicVMP.Utils;
+import org.framework.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.List;
  * @author Saul Zalimben.
  * @since 8/14/16.
  */
-public class VirtualMachine {
+public class VirtualMachine implements Comparable<VirtualMachine> {
 
     private Integer id;
 
@@ -223,5 +223,26 @@ public class VirtualMachine {
     public void setRevenue(final Revenue revenue) {
 
         this.revenue = revenue;
+    }
+
+    @Override
+    public int compareTo(VirtualMachine o) {
+
+        int compare = 0;
+
+        if(this.getTotalRevenue() > o.getTotalRevenue()) {
+            return 1;
+        } else  if(this.getTotalRevenue() < o.getTotalRevenue()) {
+            return -1;
+        }
+
+        return compare;
+
+    }
+
+    public Float getTotalRevenue() {
+
+        return this.getRevenue().totalRevenue();
+
     }
 }
