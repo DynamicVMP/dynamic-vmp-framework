@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Class that represents a Scenario
+ * <p>
+ *     A set of scenarios is the workload trace to be process.
+ * </p>
  * @author Saul Zalimben.
  * @since 8/14/16.
  */
@@ -28,6 +32,21 @@ public class Scenario implements Comparable<Scenario> {
 
     private Integer tend;
 
+
+    /* Constructors */
+
+    /**
+     * Constructor
+     * @param time             Current Time
+     * @param cloudServiceID   Cloud Service ID
+     * @param datacenterID     Datacenter ID
+     * @param virtualMachineID Virtual Machine ID
+     * @param resources        Resources
+     * @param utilization      Utilization
+     * @param revenue          Revenue
+     * @param tinit            Time init
+     * @param tend             Time end
+     */
     public Scenario(final Integer time, final Integer cloudServiceID, final Integer datacenterID,
             final Integer virtualMachineID, final Resources resources, final Resources utilization,
             final Revenue revenue, final Integer tinit, final Integer tend) {
@@ -43,23 +62,7 @@ public class Scenario implements Comparable<Scenario> {
         this.tend = tend;
     }
 
-    public void printS() {
-
-        System.out.print(this.getTime() + "\t");
-        System.out.print(this.getCloudServiceID() + "\t");
-        System.out.print(this.getDatacenterID() + "\t");
-        System.out.print(this.getVirtualMachineID() + "\t");
-        System.out.print(this.getResources().getCpu() + "\t");
-        System.out.print(this.getResources().getRam() + "\t");
-        System.out.print(this.getResources().getNet() + "\t");
-        System.out.print(this.getUtilization().getCpu() + "\t");
-        System.out.print(this.getUtilization().getRam() + "\t");
-        System.out.print(this.getUtilization().getNet() + "\t");
-        System.out.print(this.getRevenue() + "\t");
-        System.out.print(this.getTinit() + "\t");
-        System.out.print(this.getTend());
-        System.out.println();
-    }
+    /* Getters and Setters */
 
     public Integer getTime() {
         return time;
@@ -133,6 +136,15 @@ public class Scenario implements Comparable<Scenario> {
         this.tend = tend;
     }
 
+    /* Methods */
+
+    /**
+     * Compares two scenarios, using the revenue as comparator.
+     * @param requestB Scenario to compare
+     * @return If scenarioA is greater than scenarioB return 1 <br>
+     *     If scenario A is equals to scenarioB return 0 <br>
+     *     If scenarioB is greater than scenarioB return -1
+     */
     @Override
     public int compareTo(final Scenario requestB) {
 
@@ -148,8 +160,7 @@ public class Scenario implements Comparable<Scenario> {
             return -1;
         }
 
-        // Compares the requested CPU for now
-        // TODO: Check if requested Total Revenue is enough
+        // Compares the requested Revenue for now
         representativeWeightA = this.getRevenue().totalRevenue();
         representativeWeightB = requestB.getRevenue().totalRevenue();
 
@@ -165,9 +176,9 @@ public class Scenario implements Comparable<Scenario> {
 
     /**
      * Clones requests inside the [timeMemeticInit, timeMemeticEnd] range
-     * @param workload  Workload
+     * @param workload         Workload
      * @param timeMemeticStart Start time Memetic Algorithm.
-     * @param timeMemeticEnd End time Memetic Algorithm
+     * @param timeMemeticEnd   End time Memetic Algorithm
      * @return List of missed requests by Memetic Algorithm order by Revenue
      */
     public static List<Scenario> cloneScneario(List<Scenario> workload, Integer timeMemeticStart,
@@ -184,5 +195,26 @@ public class Scenario implements Comparable<Scenario> {
 
         Collections.sort(cloneScenario);
         return cloneScenario;
+    }
+
+    /**
+     * Print the scenario using {@link System#out}
+     */
+    public void printS() {
+
+        System.out.print(this.getTime() + "\t");
+        System.out.print(this.getCloudServiceID() + "\t");
+        System.out.print(this.getDatacenterID() + "\t");
+        System.out.print(this.getVirtualMachineID() + "\t");
+        System.out.print(this.getResources().getCpu() + "\t");
+        System.out.print(this.getResources().getRam() + "\t");
+        System.out.print(this.getResources().getNet() + "\t");
+        System.out.print(this.getUtilization().getCpu() + "\t");
+        System.out.print(this.getUtilization().getRam() + "\t");
+        System.out.print(this.getUtilization().getNet() + "\t");
+        System.out.print(this.getRevenue() + "\t");
+        System.out.print(this.getTinit() + "\t");
+        System.out.print(this.getTend());
+        System.out.println();
     }
 }

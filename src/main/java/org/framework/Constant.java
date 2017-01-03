@@ -40,7 +40,7 @@ public class Constant {
     /**
      * Weight for Weighted Sum (Offline)
      */
-    public final static Float WEIGHT_OFFLINE = 0.25F;
+    public static final Float WEIGHT_OFFLINE = 0.25F;
 
     /**
      * Time unit duration in seconds
@@ -68,6 +68,10 @@ public class Constant {
         HEURISTIC_MAP.put("WF", 2);
         HEURISTIC_MAP.put("FFD", 3);
         HEURISTIC_MAP.put("BFD", 4);
+    }
+
+    private Constant() {
+        // Default Constructor
     }
 }
 

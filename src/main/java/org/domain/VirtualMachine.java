@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Class that represent a Virtual Machine
  * @author Saul Zalimben.
  * @since 8/14/16.
  */
@@ -30,6 +31,13 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
 
     private Integer physicalMachine;
 
+    /* Constructors */
+
+    /**
+     * Constructor with all resources and utilization init to ZERO
+     * @param resources Resources
+     * @param utilization Utilization
+     */
     public VirtualMachine( List<Float> resources,  List<Float> utilization) {
 
         for (int i =0; i < 3; i++) {
@@ -43,6 +51,18 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
         this.utilization = utilization;
     }
 
+    /**
+     * Constructor
+     * @param id              Virtual Machine ID
+     * @param resources       Resources
+     * @param revenue         Revenue
+     * @param tinit           Time init
+     * @param tend            Time end
+     * @param utilization     Utilization
+     * @param datacenter      Datacenter
+     * @param cloudService    Cloud Service
+     * @param physicalMachine Physical Machine
+     */
     public VirtualMachine(Integer id,  List<Float> resources,  Revenue revenue,
              Integer tinit,  Integer tend,  List<Float> utilization,  Integer datacenter,
              Integer cloudService,  Integer physicalMachine) {
@@ -58,6 +78,18 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
         this.tend = tend;
     }
 
+    /**
+     * Constructor
+     * @param id              Virtual Machine ID
+     * @param resources       Resources
+     * @param revenue         Revenue
+     * @param tinit           Time init
+     * @param tend            Time end
+     * @param utilization     Utilization
+     * @param datacenter      Datacenter
+     * @param cloudService    Cloud Service
+     * @param physicalMachine Physical Machine
+     */
     public VirtualMachine(Integer id,  Resources resources,  Revenue revenue,
                           Integer tinit,  Integer tend,  Resources utilization,  Integer datacenter,
                           Integer cloudService,  Integer physicalMachine) {
@@ -72,6 +104,8 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
         this.tinit = tinit;
         this.tend = tend;
     }
+
+    /* Getters and Setters */
 
     public List<Float> getResources() {
 
@@ -123,24 +157,6 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
         this.physicalMachine = physicalMachine;
     }
 
-    /**
-     * Compare two Virtual Machine Objects
-     *
-     * @param obj Virtual Machine
-     *
-     * @return <b>True</b>, if and only if VM ID, Service ID and DC ID match <br>
-     * <b>False</b>, otherwise
-     */
-    @Override
-    public boolean equals( Object obj) {
-
-        VirtualMachine vm = (VirtualMachine) obj;
-
-            return vm != null && this.getCloudService().equals(vm.getCloudService()) &&
-                    this.getDatacenter().equals(vm.getDatacenter()) && this.getId().equals(vm.getId());
-
-    }
-
     public Integer getId() {
 
         return id;
@@ -171,8 +187,38 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
         this.cloudService = cloudService;
     }
 
+    public Revenue getRevenue() {
+
+        return revenue;
+    }
+
+    public void setRevenue(final Revenue revenue) {
+
+        this.revenue = revenue;
+    }
+
+    /* Methods */
+
     /**
-     * Clone a VM
+     * Compare two Virtual Machine Objects
+     *
+     * @param obj Virtual Machine
+     *
+     * @return <b>True</b>, if and only if VM ID, Service ID and DC ID match <br>
+     * <b>False</b>, otherwise
+     */
+    @Override
+    public boolean equals( Object obj) {
+
+        VirtualMachine vm = (VirtualMachine) obj;
+
+        return vm != null && this.getCloudService().equals(vm.getCloudService()) &&
+                this.getDatacenter().equals(vm.getDatacenter()) && this.getId().equals(vm.getId());
+
+    }
+
+    /**
+     * Create a copy of a Virtual Machine
      * @return Cloned VM
      */
     private VirtualMachine cloneVM() {
@@ -200,7 +246,7 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
 
     /**
      * Get VM by Id
-     * @param vmId Virtual Machine Id
+     * @param vmId            Virtual Machine Id
      * @param virtualMachines List of VMs
      * @return Virtual Machine
      */
@@ -211,18 +257,7 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
                 return vm;
             }
         }
-
         return null;
-    }
-
-    public Revenue getRevenue() {
-
-        return revenue;
-    }
-
-    public void setRevenue(final Revenue revenue) {
-
-        this.revenue = revenue;
     }
 
     @Override
@@ -240,6 +275,10 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
 
     }
 
+    /**
+     * Get the total Revenue
+     * @return Total Revenue
+     */
     public Float getTotalRevenue() {
 
         return this.getRevenue().totalRevenue();

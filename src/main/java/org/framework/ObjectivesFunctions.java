@@ -10,6 +10,7 @@
 package org.framework;
 
 import org.domain.*;
+import org.framework.iterativeAlgorithm.Heuristics;
 
 import java.util.ArrayList;
 import java.util.List;

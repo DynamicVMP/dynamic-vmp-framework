@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class that represents a Physical Machine.
  * @author Saul Zalimben.
  * @since 8/14/16.
  */
@@ -21,12 +22,12 @@ public class PhysicalMachine {
 
     private List<Float> utilization;
 
-    // Methods
+    /* Constructors **/
 
     /**
      * Constructor
-     * @param id New ID
-     * @param powerMax Power Max
+     * @param id        New ID
+     * @param powerMax  Power Max
      * @param resources Resources
      */
     public PhysicalMachine(Integer id, Integer powerMax, List<Float> resources) {
@@ -45,6 +46,14 @@ public class PhysicalMachine {
         }
     }
 
+    /**
+     * Constructor
+     * @param id                 New ID
+     * @param powerMax           Power Max
+     * @param resources          Resources
+     * @param resourcesRequested Requested Resources
+     * @param utilization        Utilization
+     */
     public PhysicalMachine(Integer id, Integer powerMax, List<Float> resources,
             List<Float> resourcesRequested, List<Float> utilization) {
 
@@ -54,6 +63,8 @@ public class PhysicalMachine {
         this.resourcesRequested = Utils.getListClone(resourcesRequested);
         this.utilization = Utils.getListClone(utilization);
     }
+
+    /* Getters and Setters */
 
     public Integer getPowerMax() {
         return this.powerMax;
@@ -101,8 +112,10 @@ public class PhysicalMachine {
         this.id = id;
     }
 
+    /* Methods */
+
     /**
-     * Print Physical Machine
+     * Print Physical Machine with {@link System#out}
      */
     public void printPM() {
 
@@ -114,8 +127,8 @@ public class PhysicalMachine {
     }
 
     /**
-     * Updates Utilization
-     * @param resource Resources index
+     * Update Physical Machine Resource
+     * @param resource       Resources index
      * @param newUtilization Delta Utilization
      */
     private void updateUtilizationResource (Integer resource, Float newUtilization) {
@@ -125,10 +138,10 @@ public class PhysicalMachine {
     }
 
     /**
-     * Updated ResourcesRequested
-     * @param resource Resources index
+     * Updated ResourcesRequested of a Physical Machine
+     * @param resource      Resources index
      * @param deltaResource New Resource
-     * @param operation Operation
+     * @param operation     Operation
      */
     public void updateResource (Integer resource, Float deltaResource,
             String operation ) {
@@ -168,7 +181,7 @@ public class PhysicalMachine {
 
     /**
      * Get PM by Id
-     * @param pmId Physical Machine Id
+     * @param pmId             Physical Machine Id
      * @param physicalMachines List of PMs
      * @return Physical Machine
      */
@@ -179,12 +192,11 @@ public class PhysicalMachine {
                 return pm;
             }
         }
-
         return null;
     }
 
     /**
-     * Update Utilization
+     * Update Physical Machine Utilization
      */
     public void updateUtilization() {
 
@@ -210,8 +222,8 @@ public class PhysicalMachine {
     }
 
     /**
-     * Clone a PM
-     * @return Cloned PM
+     * Create a copy of the Physical Machine
+     * @return Cloned Physical Machine
      */
     private PhysicalMachine clonePM() {
 
@@ -236,8 +248,13 @@ public class PhysicalMachine {
     }
 
     /**
-     * @param vm              Virtual Machine
-     * @param operation       Operation
+     * Update Physical Machine Resources
+     * <p>
+     *     - {@link Utils#SUM}: Increase the requested resources
+     *     - {@link Utils#SUB}: Decrease the requested resources.
+     * </p>
+     * @param vm        Virtual Machine
+     * @param operation Operation ({@link Utils#SUM} or {@link Utils#SUB})
      */
     public void updatePMResources(VirtualMachine vm, String operation) {
 

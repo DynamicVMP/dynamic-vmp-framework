@@ -1,7 +1,14 @@
 package org.domain;
 
 /**
- * Created by Leonardo Benitez.
+ * Class that represents the range that a variable could have during the experiments.
+ * <p>
+ *     <b>i.e.</b>: <br>
+ *         APrioriValue revenue = new APrioriValue(MIN_REVENUE, MAX_REVENUE). <br>
+ *         So, revenue = [MIN_REVENUE, MAX_REVENUE].
+ * </p>
+ *
+ * @author Leonardo Benitez.
  */
 public class APrioriValue {
 
@@ -13,6 +20,7 @@ public class APrioriValue {
         this.maxValue = maxValue;
     }
 
+    /* Getters and Setters */
 
     public Float getMinValue() {
         return minValue;

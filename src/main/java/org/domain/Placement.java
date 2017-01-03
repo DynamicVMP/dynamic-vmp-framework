@@ -6,7 +6,15 @@ import org.framework.Utils;
 import java.util.List;
 
 /**
- * Created by Leonardo Benitez.
+ * Class that represents a Placement.
+ * <p>
+ *     A placement has a set of physical machines,
+ *     a set of allocated virtual machines,
+ *     a set of derived virtual machines,
+ *     the total memory migrated,
+ *     and his score
+ * </p>
+ * @author Leonardo Benitez.
  */
 public class Placement  {
 
@@ -16,6 +24,12 @@ public class Placement  {
     private List<VirtualMachine> derivedVMs;
     private Float placementScore;
 
+    /**
+     * Constructor
+     * @param physicalMachines   List of Physical Machine
+     * @param virtualMachineList List of allocated Virtual Machine
+     * @param derivedVMs         List of derived Virtual Machine
+     */
     public Placement(final List<PhysicalMachine> physicalMachines, final List<VirtualMachine> virtualMachineList,
             final List<VirtualMachine> derivedVMs) {
 
@@ -24,6 +38,15 @@ public class Placement  {
         this.derivedVMs = derivedVMs;
     }
 
+    /* Constructors */
+
+    /**
+     * Constructor
+     * @param physicalMachines   List of Physical Machine
+     * @param virtualMachineList List of allocated Virtual Machine
+     * @param derivedVMs         List of derived Virtual Machine
+     * @param placementScore     Placement Score
+     */
     public Placement(final List<PhysicalMachine> physicalMachines, final List<VirtualMachine> virtualMachineList,
             final List<VirtualMachine> derivedVMs, Float placementScore) {
 
@@ -32,6 +55,8 @@ public class Placement  {
         this.derivedVMs = derivedVMs;
         this.placementScore = placementScore;
     }
+
+    /* Getters and Setters */
 
     public List<VirtualMachine> getVirtualMachineList() {
         return virtualMachineList;
@@ -77,7 +102,12 @@ public class Placement  {
         this.totalMigratedMemory = totalMigratedMemory;
     }
 
+    /* Methods */
 
+    /**
+     * Update the Placement Score
+     * @param aPrioriValueList List of AprioriValues
+     */
     public void updatePlacementScore(List<APrioriValue> aPrioriValueList){
 
         Float[] objectiveFunctions = ObjectivesFunctions.loadObjectiveFunctions(this.getVirtualMachineList(),

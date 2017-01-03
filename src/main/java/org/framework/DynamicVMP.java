@@ -10,10 +10,11 @@
 package org.framework;
 
 import org.domain.*;
-import org.framework.cleverReconfiguration.CleverReconfiguration;
-import org.framework.periodicMigration.PeriodicMigration;
-import org.framework.stateOfArt.StateOfArt;
-import org.framework.thresholdBasedApproach.ThresholdBasedApproach;
+import org.framework.algorithm.cleverReconfiguration.CleverReconfiguration;
+import org.framework.algorithm.periodicMigration.PeriodicMigration;
+import org.framework.algorithm.stateOfArt.StateOfArt;
+import org.framework.algorithm.thresholdBasedApproach.ThresholdBasedApproach;
+import org.framework.iterativeAlgorithm.Heuristics;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +28,34 @@ import java.util.stream.Stream;
 
 public class DynamicVMP {
 
+    /**
+     * Algorithm Interface
+     */
+    @FunctionalInterface
+    interface Algorithm {
+        void useAlgorithm(List<Scenario> workload, List<PhysicalMachine> physicalMachines,
+                List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs,
+                Map<Integer, Float> revenueByTime, List<Resources> wastedResources,  Map<Integer, Float> wastedResourcesRatioByTime,
+                Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
+                Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
+                throws IOException, InterruptedException, ExecutionException;
+    }
+
+    /**
+     * List of Heuristics Algorithms
+     */
+    private static final Algorithm[] algorithms;
+    static {
+        algorithms = new Algorithm[]{
+                PeriodicMigration::periodicMigrationManager,            // Alg0
+                StateOfArt::stateOfArtManager,                          // Alg1
+                ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg2
+                CleverReconfiguration::cleverReconfigurationgManager,   // Alg3
+        };
+    }
+
     public static final String DYNAMIC_VMP = "DynamicVMP";
+    private static Logger logger = Logger.getLogger(DYNAMIC_VMP);
 
     public static Integer timeSimulated;
     public static Integer initialTimeUnit;
@@ -62,37 +90,10 @@ public class DynamicVMP {
      *      >
      * </pre>
      */
-    static Map<Integer, Violation> unsatisfiedResources = new HashMap<>();
+    public static Map<Integer, Violation> unsatisfiedResources = new HashMap<>();
 
     private DynamicVMP () {
         // Default Constructor
-    }
-
-    /**
-     * Algorithm Interface
-     */
-    @FunctionalInterface
-    interface Algorithm {
-        void useAlgorithm(List<Scenario> workload, List<PhysicalMachine> physicalMachines,
-                List<VirtualMachine>
-                        virtualMachines, List<VirtualMachine> derivedVMs,
-                Map<Integer, Float> revenueByTime, List<Resources> wastedResources,  Map<Integer, Float> wastedResourcesRatioByTime,
-                Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
-                Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
-                throws IOException, InterruptedException, ExecutionException;
-    }
-
-    /**
-     * List of Heuristics Algorithms
-     */
-    private static Algorithm[] algorithms;
-    static {
-        algorithms = new Algorithm[]{
-                PeriodicMigration::periodicMigrationManager,            // Alg0
-                StateOfArt::stateOfArtManager,                          // Alg1
-                ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg2
-                CleverReconfiguration::cleverReconfigurationgManager,   // Alg3
-        };
     }
 
     /**
@@ -141,7 +142,7 @@ public class DynamicVMP {
                     requests[3]++;
                 }
             } else {
-                Logger.getLogger(DYNAMIC_VMP).log(Level.SEVERE, "WorkloadException!");
+                logger.log(Level.SEVERE, "WorkloadException!");
             }
         }
     }
@@ -155,27 +156,23 @@ public class DynamicVMP {
             List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs,
             List<VirtualMachine> vmToMigrate) {
 
-
         Collections.sort(vmToMigrate);
-        PhysicalMachine physicalMachine;
+        PhysicalMachine hostPm;
 
         for (VirtualMachine vm : vmToMigrate) {
-            physicalMachine = PhysicalMachine.getById(vm.getPhysicalMachine(), physicalMachines);
+            hostPm = PhysicalMachine.getById(vm.getPhysicalMachine(), physicalMachines);
 
             for (PhysicalMachine pm : physicalMachines) {
 
-                if(physicalMachine != null &&  !pm.getId().equals(physicalMachine.getId())) {
+                if(hostPm != null && !pm.getId().equals(hostPm.getId())
+                    && Constraints.checkResources(pm, null, vm, virtualMachines, true)
+                    && Heuristics.getHeuristics()[code]
+                        .useHeuristic(vm, physicalMachines, virtualMachines, derivedVMs)) {
 
-                    if (Constraints.checkResources(pm, null, vm, virtualMachines, true)) {
+                    virtualMachines.remove(vm);
+                    hostPm.updatePMResources(vm, Utils.SUB);
+                    break;
 
-                        if(Heuristics.getHeuristics()[code]
-                                .useHeuristic(vm, physicalMachines, virtualMachines, derivedVMs)) {
-
-                            virtualMachines.remove(vm);
-                            physicalMachine.updatePMResources(vm, Utils.SUB);
-                            break;
-                        }
-                    }
                 }
             }
         }
@@ -234,14 +231,14 @@ public class DynamicVMP {
         ArrayList<String> scenariosFiles  = new ArrayList<>();
         loadParameters(scenariosFiles, args[0]);
 
-        Logger.getLogger(DYNAMIC_VMP).log(Level.INFO, "STARTING EXPERIMENTS");
+        logger.log(Level.INFO, "STARTING EXPERIMENTS");
 
         for (String scenarioFile : scenariosFiles) {
             // For debug only
-            System.out.println(scenarioFile);
+            // logger.log(Level.FINE, scenarioFile);
             launchExperiments(Parameter.HEURISTIC_CODE, Parameter.PM_CONFIG, scenarioFile);
         }
-        Logger.getLogger(DYNAMIC_VMP).log(Level.INFO, "ENDING EXPERIMENTS");
+        logger.log(Level.INFO, "ENDING EXPERIMENTS");
 
     }
 
@@ -309,8 +306,20 @@ public class DynamicVMP {
                             revenueByTime, wastedResources, wastedResourcesRatioByTime, powerByTime,
                             placements, code, timeUnit, requestsProcess, maxPower, realRevenue, scenarioFile);
         } catch (ArrayIndexOutOfBoundsException e) {
-            Logger.getLogger(DYNAMIC_VMP).log(Level.SEVERE, "Is not a valid algorithm!");
+            logger.log(Level.SEVERE, "Is not a valid algorithm!");
+            throw e;
         }
+
+        Float scenarioScored = ObjectivesFunctions.getScenarioScore(revenueByTime, placements, realRevenue);
+
+        Utils.printToFile(Constant.POWER_CONSUMPTION_FILE, Utils.getAvgPwConsumptionNormalized(powerByTime));
+        Utils.printToFile(Constant.WASTED_RESOURCES_FILE, Utils.getAvgResourcesWNormalized(wastedResourcesRatioByTime));
+        Utils.printToFile(Constant.ECONOMICAL_REVENUE_FILE, Utils.getAvgRevenueNormalized(revenueByTime));
+        Utils.printToFile(Constant.WASTED_RESOURCES_RATIO_FILE, wastedResources);
+        Utils.printToFile(Constant.SCENARIOS_SCORES, scenarioScored);
+        Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE,"\n");
+        Utils.printToFile(Constant.ECONOMICAL_PENALTIES_FILE, DynamicVMP.economicalPenalties);
+        Utils.printToFile(Constant.LEASING_COSTS_FILE, DynamicVMP.leasingCosts);
     }
 
     /**
@@ -470,6 +479,11 @@ public class DynamicVMP {
     public static Algorithm[] getAlgorithms() {
 
         return algorithms;
+    }
+
+    public static Logger getLogger() {
+
+        return logger;
     }
 }
 

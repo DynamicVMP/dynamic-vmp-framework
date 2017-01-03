@@ -7,21 +7,25 @@ package org.framework;
  */
 public class Parameter {
 
+    private Parameter() {
+        // Default Constructor
+    }
+
     // EXPERIMENTS PARAMETERS
     /**
      * Heuristic Algorithm Code
      */
-    static String HEURISTIC_CODE;
+    public static String HEURISTIC_CODE;
 
     /**
      * Physical Machine Configuration
      */
-    static String PM_CONFIG;
+    public static String PM_CONFIG;
 
     /**
      * Penalty for derive VM
      */
-    static Float DERIVE_COST;
+    public static Float DERIVE_COST;
 
     /**
      * FAULT_TOLERANCE: Indicates if it is applying tolerance to failures.
@@ -35,7 +39,7 @@ public class Parameter {
      * </ul>
      *
      */
-    static Boolean FAULT_TOLERANCE;
+    public static Boolean FAULT_TOLERANCE;
 
     /**
      * Protection Factor:
@@ -54,32 +58,32 @@ public class Parameter {
     /**
      * Interval Execution Memetic Algorithm
      */
-    static Integer INTERVAL_EXECUTION_MEMETIC;
+    public static Integer INTERVAL_EXECUTION_MEMETIC;
 
     /**
      * Population Size
      */
-    static Integer POPULATION_SIZE;
+    public static Integer POPULATION_SIZE;
 
     /**
      * Number of Generations
      */
-    static Integer NUMBER_GENERATIONS;
+    public static Integer NUMBER_GENERATIONS;
 
     /**
      * Execution Duration
      */
-    static Integer EXECUTION_DURATION;
+    public static Integer EXECUTION_DURATION;
 
     /**
      * Link Capacity in Gbps
      */
-    static Float LINK_CAPACITY;
+    public static Float LINK_CAPACITY;
 
     /**
      * Percentage of overload when migration process is active
      */
-    static Float MIGRATION_FACTOR_LOAD;
+    public static Float MIGRATION_FACTOR_LOAD;
 
     /**
      * Historical objective functions values size
@@ -98,7 +102,7 @@ public class Parameter {
      * MD -> Manhattan Distance
      * WS -> Weighted Sum
      */
-    static String SCALARIZATION_METHOD;
+    public static String SCALARIZATION_METHOD;
 
     /**
      * Type of Algorithm

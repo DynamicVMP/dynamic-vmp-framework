@@ -10,6 +10,11 @@
 package org.domain;
 
 /**
+ * Class that represents the Resources.
+ * <p>
+ *     This class works as a wrapper of the Virtual Machine and Physical Machine resources,
+ *     is a set of CPU, RAM and NET
+ * </p>
  * @author Saul Zalimben.
  * @since 8/20/16.
  */
@@ -19,8 +24,10 @@ public class Resources {
     private Float ram;
     private Float net;
 
+    /* Constructors */
+
     /**
-     * Default Constructor
+     * Constructor
      * @param cpu CPU
      * @param ram RAM
      * @param net NET
@@ -32,11 +39,17 @@ public class Resources {
         this.net = net;
     }
 
+    /**
+     * Default Constructor <br>
+     * All resources init to ZERO
+     */
     public Resources() {
         this.cpu = 0F;
         this.ram = 0F;
         this.net = 0F;
     }
+
+    /* Getters and Setters */
 
     public Float getCpu() {
 

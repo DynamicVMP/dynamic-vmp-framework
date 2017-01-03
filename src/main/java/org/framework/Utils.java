@@ -10,12 +10,11 @@
 package org.framework;
 
 import org.domain.*;
-import org.framework.comparators.MemoryComparator;
-import org.framework.enums.ResourcesEnum;
-import org.framework.memeticAlgorithm.MASettings;
+import org.framework.comparator.MemoryComparator;
+import org.framework.reconfigurationAlgorithm.enums.ResourcesEnum;
+import org.framework.reconfigurationAlgorithm.memeticAlgorithm.MASettings;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
@@ -27,20 +26,23 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.nio.file.Files.*;
+
 /**
  * @author Saul Zalimben.
  * @since 8/15/16.
  */
 public class Utils {
 
-    static final String BASE_DIR = "vmpOverbookingElasticity/";
-    static final String OUTPUT = "outputs/";
-    static final String INPUT = "inputs/";
+    public static final String OUTPUT = "outputs/";
+    public static final String INPUT = "inputs/";
 
-    static final String SUM = "SUM";
-    static final String SUB = "SUB";
+    public static final String SUM = "SUM";
+    public static final String SUB = "SUB";
     public static final String SCENARIOS = "SCENARIOS";
     private static Random  random;
+
+    private static Logger logger = Logger.getLogger("Utils");
 
     private Utils() {
         // Default Constructor
@@ -247,14 +249,14 @@ public class Utils {
             List<Scenario> scenarios) throws IOException {
 
         Float maxPower;
-        try (Stream<String> stream = Files.lines(Paths.get(INPUT + pmConfig))) {
+        try (Stream<String> stream = lines(Paths.get(INPUT + pmConfig))) {
             maxPower = Utils.loadPhysicalMachines(physicalMachines, stream);
         } catch (IOException e) {
             Logger.getLogger(DynamicVMP.DYNAMIC_VMP).log(Level.SEVERE, "Error trying to load PM Configuration!");
             throw e;
         }
 
-        try (Stream<String> stream = Files.lines(Paths.get(INPUT + scenarioFile))) {
+        try (Stream<String> stream = lines(Paths.get(INPUT + scenarioFile))) {
             Utils.loadScenario(scenarios, stream);
         } catch (IOException e) {
             Logger.getLogger(DynamicVMP.DYNAMIC_VMP).log(Level.SEVERE, "Error trying to load Scenario: " +
@@ -274,16 +276,16 @@ public class Utils {
      */
     public static void printToFile(String file, Object toPrint) throws IOException {
 
-	    if(!Files.exists(Paths.get(Utils.OUTPUT))){
-		    Files.createDirectory(Paths.get(Utils.OUTPUT));
+	    if(!(Paths.get(Utils.OUTPUT).toFile().exists())){
+		    createDirectory(Paths.get(Utils.OUTPUT));
 	    }
 
 	    if(toPrint instanceof Collection<?>){
 		    List<?> toPrintList = (ArrayList<String>)toPrint;
 		    toPrintList.forEach(consumer -> {
 			    try {
-				    Files.write(Paths.get(file), consumer.toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-				    Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
+				    write(Paths.get(file), consumer.toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				    write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
 			    } catch (IOException e) {
 				    Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
 			    }
@@ -293,16 +295,16 @@ public class Utils {
 		    Map<Integer,Float> toPrintMap  = (Map<Integer,Float>)toPrint;
 		    for (Map.Entry<Integer, Float> entry : toPrintMap.entrySet()) {
 			    try {
-				    Files.write(Paths.get(file), entry.getValue().toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-				    Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
+				    write(Paths.get(file), entry.getValue().toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				    write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
 			    } catch (IOException e) {
 				    Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
 			    }
 		    }
 	    }else{
 		    try {
-			    Files.write(Paths.get(file), toPrint.toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-			    Files.write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
+			    write(Paths.get(file), toPrint.toString().getBytes(),StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+			    write(Paths.get(file), "\n".getBytes(), StandardOpenOption.APPEND);
 		    } catch (IOException e) {
 			    Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(), e );
 		    }
@@ -362,7 +364,7 @@ public class Utils {
                 pool.shutdownNow(); // Cancel currently executing tasks
                 // Wait a while for tasks to respond to being cancelled
                 if (!pool.awaitTermination(60, TimeUnit.SECONDS))
-                    System.err.println("Pool did not terminate");
+                    logger.log(Level.INFO,"Pool did not terminate");
             }
         } catch (InterruptedException ie) {
             // (Re-)Cancel if current thread also interrupted
@@ -658,7 +660,9 @@ public class Utils {
 		List<Float> result = new ArrayList<>();
 		Float level = 0F;
 		Float trend = 0F;
-		Float lastLevel=0F,lastTrend=0F,value=0F;
+		Float lastLevel;
+        Float lastTrend;
+        Float value;
 
 		result.add(series.get(0));
 		for(int iterator=1;iterator<series.size(); iterator++){

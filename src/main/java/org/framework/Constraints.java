@@ -2,7 +2,7 @@ package org.framework;
 
 import org.domain.PhysicalMachine;
 import org.domain.VirtualMachine;
-import org.framework.configuration.ExperimentConf;
+import org.framework.reconfigurationAlgorithm.configuration.ExperimentConf;
 
 import java.util.ArrayList;
 import java.util.List;
