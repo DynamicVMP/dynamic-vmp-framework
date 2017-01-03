@@ -88,14 +88,19 @@ public class DynamicVMP {
     private static Algorithm[] algorithms;
     static {
         algorithms = new Algorithm[]{
-                StateOfArt::stateOfArtManager,                          // Alg0
-                PeriodicMigration::periodicMigrationManager,            // Alg1
+                PeriodicMigration::periodicMigrationManager,            // Alg0
+                StateOfArt::stateOfArtManager,                          // Alg1
                 ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg2
                 CleverReconfiguration::cleverReconfigurationgManager,   // Alg3
         };
     }
 
     /**
+     * If
+     * Add new VMs request to the Datacenter <br>
+     *
+     *
+     *
      * @param s                One request of Workload Scenario
      * @param code             Heuristics Code
      * @param physicalMachines List of Physical Machine

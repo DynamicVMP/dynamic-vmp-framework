@@ -288,9 +288,6 @@ public class ObjectivesFunctions {
             tempSum += Math.pow(objFunctValue,2);
         }
         Double distance = Math.sqrt(tempSum);
-        if(distance > 1) {
-            return (float) Math.round(distance);
-        }
         return distance.floatValue();
     }
 
