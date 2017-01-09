@@ -208,7 +208,9 @@ public class DynamicVMP {
      * <b>Parameter file structure:</b>
      * <ul>
      *  <li>
-     *      args[0]: Heuristics Code
+     *      ALGORITHM = Algorithm Code
+     *  </li>
+     *      <li>HEURISTIC_CODE = Heuristic Code</li>
      *      <ul>
      *          <li>- FF -> First Fit</li>
      *          <li>- BF -> Best Fit </li>
@@ -218,18 +220,70 @@ public class DynamicVMP {
      *      </ul>
      *  </li>
      *  <li>
-     *      args[1]: PMConfig file
+     *      PM_CONFIG = Load CPU Configuration
+     *      <ul>
+     *          <li>- LOW </li>
+     *          <li>- MED </li>
+     *          <li>- HIGH </li>
+     *          <li>- FULL </li>
+     *          <li>- SATURATED </li>
+     *      </ul>
      *  </li>
      *  <li>
-     *      args[2 ... n]: Scenario files
+     *      DERIVE_COST = Cost per each derived VM
      *  </li>
+     *  <li>
+     *      PROTECTION_FACTOR = Protection Factor
+     *  </li>
+     *  <li>
+     *      INTERVAL_EXECUTION_MEMETIC = Periodic Time of MA Execution
+     *  </li>
+     *  <li>
+     *      POPULATION_SIZE = Population size for MA
+     *  </li>
+     *  <li>
+     *      NUMBER_GENERATIONS = Generations size for MA
+     *  </li>
+     *  <li>
+     *      EXECUTION_DURATION = Time of Duration
+     *  </li>
+     *  <li>
+     *      LINK_CAPACITY = Link Capacity for Migration
+     *  </li>
+     *  <li>
+     *      MIGRATION_FACTOR_LOAD = Factor Load per Migration
+     *  </li>
+     *  <li>
+     *      HISTORICAL_DATA_SIZE = Historical Data Sieze
+     *  </li>
+     *  <li>
+     *      FORECAST_SIZE = Forecast Size
+     *  </li>
+     *  <li>
+     *      SCALARIZATION_METHOD = Scalarization Method
+     *      <ul>
+     *          <li>- ED -> Euclidean Distance </li>
+     *          <li>- MD -> Manhattan Distance </li>
+     *          <li>- CD -> Chevyshev Distance </li>
+     *          <li>- WS -> Weighted Sum </li>
+     *      </ul>
+     *  </li>
+     *  </li>
+     *  <li>
+     *      SCENARIOS = List of Request
+     *  </li>
+
      * </ul>
      * If you want to add more parameters, changes the {@link DynamicVMP#loadParameters(ArrayList, String)}
      */
     public static void main (String[] args) throws IOException, InterruptedException, ExecutionException {
 
         ArrayList<String> scenariosFiles  = new ArrayList<>();
-        loadParameters(scenariosFiles, args[0]);
+        if(!(args.length > 0)) {
+            logger.log(Level.INFO, "Some arguments are missing!");
+        }
+        String parameterFile = args[0];
+        loadParameters(scenariosFiles, parameterFile);
 
         logger.log(Level.INFO, "EXECUTING EXPERIMENTS");
 
@@ -244,11 +298,12 @@ public class DynamicVMP {
 
     /**
      * @param scenariosFiles Scenarios Files
+     * @param parameterFile  Parameter File
      * @throws IOException
      */
-    private static void loadParameters(ArrayList<String> scenariosFiles, String file) throws IOException {
+    private static void loadParameters(ArrayList<String> scenariosFiles, String parameterFile) throws IOException {
 
-        try (Stream<String> stream = Files.lines(Paths.get(file))) {
+        try (Stream<String> stream = Files.lines(Paths.get(parameterFile))) {
             Utils.loadParameter(scenariosFiles, stream);
         } catch (IOException e) {
             Logger.getLogger(DynamicVMP.DYNAMIC_VMP).log(Level.SEVERE, "Error trying to load experiments parameters.");
