@@ -17,15 +17,15 @@ import java.util.Map;
  * <p>
  *  Track resources violation per VM, per Time and per resources <br>
  *  <pre>
- *  violation ->
- *      < virtualMachineId = 1,
- *        < time = 1,
- *          < cpuViolation = X,
+ *  violation {
+ *      { virtualMachineId = 1,
+ *        { time = 1,
+ *          { cpuViolation = X,
  *            ramViolation = X,
- *            netViolation = x >
- *          >
- *        >
- *      >
+ *            netViolation = x }
+ *          }
+ *        }
+ *      }
  * </pre>
  *
  * @author Saul Zalimben.

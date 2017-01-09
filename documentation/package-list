@@ -1,0 +1,12 @@
+org.domain
+org.framework
+org.framework.algorithm.cleverReconfiguration
+org.framework.algorithm.periodicMigration
+org.framework.algorithm.stateOfArt
+org.framework.algorithm.thresholdBasedApproach
+org.framework.comparator
+org.framework.iterativeAlgorithm
+org.framework.reconfigurationAlgorithm.concurrent
+org.framework.reconfigurationAlgorithm.configuration
+org.framework.reconfigurationAlgorithm.enums
+org.framework.reconfigurationAlgorithm.memeticAlgorithm

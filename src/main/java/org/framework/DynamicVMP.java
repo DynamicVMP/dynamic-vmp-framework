@@ -76,18 +76,18 @@ public class DynamicVMP {
     static Map<Integer, Float> migratedMemoryAprioriTime = new HashMap<>();
 
     /**
-     *  Map <VM_ID, Violation> -> Violation per VM, per Time, per Resources
+     *  Map {VM_ID, Violation} = Violation per VM, per Time, per Resources
      *  Track resources violation per VM, per Time and per resources <br>
      *  <pre>
-     *  violation ->
-     *      < virtualMachineId = 1,
-     *        < time = 1,
-     *          < cpuViolation = X,
+     *  violation {
+     *      { virtualMachineId = 1,
+     *        { time = 1,
+     *          { cpuViolation = X,
      *            ramViolation = X,
-     *            netViolation = x >
-     *          >
-     *        >
-     *      >
+     *            netViolation = x }
+     *          }
+     *        }
+     *      }
      * </pre>
      */
     public static Map<Integer, Violation> unsatisfiedResources = new HashMap<>();
@@ -114,6 +114,7 @@ public class DynamicVMP {
      *          <li>Requests[2]: requestUpdated Number of requests updated</li>
      *          <li>Requests[3]: violation Number of violation</li>
      *        </ul>
+     * @param isMigrationActive Is migration active
      */
     public static void runHeuristics (Scenario s, Integer code, List<PhysicalMachine> physicalMachines,
             List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs, Integer[] requests,
@@ -151,6 +152,8 @@ public class DynamicVMP {
     /**
      * @param code             Heuristic Code
      * @param physicalMachines List of Physical Machines
+     * @param virtualMachines  List of allocated Virtual Machines
+     * @param derivedVMs       List of derived Virtual Machines
      * @param vmToMigrate      List of VM to migrate
      */
     public static void runHeuristics (Integer code, List<PhysicalMachine> physicalMachines,
@@ -211,23 +214,23 @@ public class DynamicVMP {
      *  <li>
      *      ALGORITHM = Algorithm Code
      *  </li>
-     *      <li>HEURISTIC_CODE = Heuristic Code</li>
+     *      <li>HEURISTIC_CODE = Heuristic Code
      *      <ul>
-     *          <li>- FF -> First Fit</li>
-     *          <li>- BF -> Best Fit </li>
-     *          <li>- WF -> Worst Fit </li>
-     *          <li>- FFD -> First Fit Decreasing</li>
-     *          <li>- BFD -> Best Fit Decreasing</li>
+     *          <li> FF = First Fit</li>
+     *          <li> BF = Best Fit </li>
+     *          <li> WF = Worst Fit </li>
+     *          <li> FFD = First Fit Decreasing</li>
+     *          <li> BFD = Best Fit Decreasing</li>
      *      </ul>
      *  </li>
      *  <li>
      *      PM_CONFIG = Load CPU Configuration
      *      <ul>
-     *          <li>- LOW </li>
-     *          <li>- MED </li>
-     *          <li>- HIGH </li>
-     *          <li>- FULL </li>
-     *          <li>- SATURATED </li>
+     *          <li> LOW </li>
+     *          <li> MED </li>
+     *          <li> HIGH </li>
+     *          <li> FULL </li>
+     *          <li> SATURATED </li>
      *      </ul>
      *  </li>
      *  <li>
@@ -263,12 +266,11 @@ public class DynamicVMP {
      *  <li>
      *      SCALARIZATION_METHOD = Scalarization Method
      *      <ul>
-     *          <li>- ED -> Euclidean Distance </li>
-     *          <li>- MD -> Manhattan Distance </li>
-     *          <li>- CD -> Chevyshev Distance </li>
-     *          <li>- WS -> Weighted Sum </li>
+     *          <li>- ED = Euclidean Distance </li>
+     *          <li>- MD = Manhattan Distance </li>
+     *          <li>- CD = Chevyshev Distance </li>
+     *          <li>- WS = Weighted Sum </li>
      *      </ul>
-     *  </li>
      *  </li>
      *  <li>
      *      SCENARIOS = List of Request
@@ -276,6 +278,12 @@ public class DynamicVMP {
 
      * </ul>
      * If you want to add more parameters, changes the {@link DynamicVMP#loadParameters(ArrayList, String)}
+     *
+     * @param args List of arguments (as array)
+     *
+     * @throws IOException          Error managing files
+     * @throws InterruptedException Multi-thread error
+     * @throws ExecutionException   Multi-thread error
      */
     public static void main (String[] args) throws IOException, InterruptedException, ExecutionException {
 

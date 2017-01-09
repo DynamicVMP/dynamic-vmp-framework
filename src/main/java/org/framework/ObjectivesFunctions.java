@@ -237,11 +237,11 @@ public class ObjectivesFunctions {
         return memoryMigrated;
     }
 
-
     /**
      * OF: Max Migrated memory between Physical Machines
      * @param oldVirtualMachineList List of VMs (before migration)
      * @param newVirtualMachineList List of VMs (after migration)
+     * @param numberOfPMs           Number of PMs
      * @return max migrated memory between two physical machines
      */
     public static Float migratedMemoryBtwPM(List<VirtualMachine> oldVirtualMachineList, List<VirtualMachine> newVirtualMachineList, Integer numberOfPMs){
@@ -264,6 +264,7 @@ public class ObjectivesFunctions {
     /**
      * Combine objective function values using the approach distance from the origin
      * @param objFunctValues List of objective function value normalized.
+     * @param weight         PM's weight
      * @return distance from origin
      */
     public static Float getScalarizationMethod(List<Float> objFunctValues, Float weight){
@@ -357,6 +358,7 @@ public class ObjectivesFunctions {
      *     one value. (the placement score)
      * </p>
      * @param timeUnit                   TimeUnit
+     * @param maxPower                   MaxPower (possible) consumed by a PM
      * @param wastedResourcesRatioByTime WastedResourcesRatio per time t
      * @param powerByTime                Power Consumption per time t
      * @param revenueByTime              Revenue per time t

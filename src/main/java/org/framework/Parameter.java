@@ -46,10 +46,10 @@ public class Parameter {
      * It can take values between 0 and 1,where
      * <ul>
      *     <li>
-     *         0 -> No overbooking
+     *         0 = No overbooking
      *     </li>
      *     <li>
-     *         1 -> Full Overbooking (high risk of violation of SLA)
+     *         1 = Full Overbooking (high risk of violation of SLA)
      *     </li>
      * </ul>
      */
@@ -97,19 +97,19 @@ public class Parameter {
 
     /**
      * Map of the Scalarization Method
-     * ED -> Euclidean Distance
-     * CD -> Chevyshev Distance
-     * MD -> Manhattan Distance
-     * WS -> Weighted Sum
+     * ED = Euclidean Distance
+     * CD = Chevyshev Distance
+     * MD = Manhattan Distance
+     * WS = Weighted Sum
      */
     public static String SCALARIZATION_METHOD;
 
     /**
      * Type of Algorithm
-     * 0 -> State of Art
-     * 1 -> Beloglazob Approach
-     * 2 -> Periodic Reconfiguration
-     * 3 -> Clever Reconfiguration
+     * 0 = State of Art
+     * 1 = Beloglazob Approach
+     * 2 = Periodic Reconfiguration
+     * 3 = Clever Reconfiguration
      */
     public static Integer ALGORITHM;
 }

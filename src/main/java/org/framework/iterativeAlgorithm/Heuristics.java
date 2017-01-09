@@ -73,11 +73,11 @@ public class Heuristics {
      * @param virtualMachines      Virtual Machines
      * @param derivedVMs           List of Derived Virtual Machine
      * @param physicalMachines     List of Physical Machines
+     * @param isMigrationActive    Is Migration active
      * @return <b>True</b>, if PM can host new Resources
      */
     public static Boolean updateVM(Scenario s, List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs,
-            List<PhysicalMachine> physicalMachines, Boolean
-            isMigrationActive) {
+            List<PhysicalMachine> physicalMachines, Boolean isMigrationActive) {
 
         Boolean success = false;
         PhysicalMachine physicalMachine;

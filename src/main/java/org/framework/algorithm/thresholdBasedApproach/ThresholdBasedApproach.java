@@ -44,6 +44,7 @@ public class ThresholdBasedApproach {
      * @param timeUnit                   Time init
      * @param requestsProcess            Type of Process
      * @param maxPower                   Maximum Power Consumption
+     * @param scenarioFile               Name of Scenario
      *
      * <b>RequestsProcess</b>:
      *  <ul>
@@ -53,7 +54,9 @@ public class ThresholdBasedApproach {
      *      <li>Requests[3]: violation Number of violation</li>
      *  </ul>
      *
-     * @throws IOException
+     * @throws IOException          Error managing files
+     * @throws InterruptedException Multi-thread error
+     * @throws ExecutionException   Multi-thread error
      */
     public static void thresholdBasedApproachManager(List<Scenario> workload, List<PhysicalMachine> physicalMachines,
             List<VirtualMachine>

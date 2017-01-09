@@ -22,7 +22,7 @@ import static org.domain.VirtualMachine.getById;
  * <b>Algorithm 1: Periodic Migration (StateOfArt)</b>
  *<p>
  *     Migration is launching periodically.
- *     If a new VM request comes while memetic execution, memetic algorithm is cancel.
+ *     If a new VM request comes while memetic execution, reconfiguration is cancel.
  *</p>
  * @author Saul Zalimben.
  * @since 12/29/16.
@@ -35,6 +35,35 @@ public class StateOfArt {
         // Default Constructor
     }
 
+    /**
+     * State Of Art Manager
+     * @param workload                   Workload Trace
+     * @param physicalMachines           List of Physical Machines
+     * @param virtualMachines            List of Virtual Machines
+     * @param derivedVMs                 List of Derived Virtual Machines
+     * @param revenueByTime              Revenue by time
+     * @param wastedResources            WastedResources by time
+     * @param wastedResourcesRatioByTime WastedResourcesRatio per time
+     * @param powerByTime                Power Consumption by time
+     * @param placements                 List of Placement by time
+     * @param code                       Heuristics Algorithm Code
+     * @param timeUnit                   Time init
+     * @param requestsProcess            Type of Process
+     * @param maxPower                   Maximum Power Consumption
+     * @param scenarioFile               Name of Scenario
+     *
+     * <b>RequestsProcess</b>:
+     *  <ul>
+     *      <li>Requests[0]: requestServed Number of requests served</li>
+     *      <li>Requests[1]: requestRejected Number of requests rejected</li>
+     *      <li>Requests[2]: requestUpdated Number of requests updated</li>
+     *      <li>Requests[3]: violation Number of violation</li>
+     *  </ul>
+     *
+     * @throws IOException          Error managing files
+     * @throws InterruptedException Multi-thread error
+     * @throws ExecutionException   Multi-thread error
+     */
     public static void stateOfArtManager(List<Scenario> workload, List<PhysicalMachine> physicalMachines,
             List<VirtualMachine>
             virtualMachines, List<VirtualMachine> derivedVMs,

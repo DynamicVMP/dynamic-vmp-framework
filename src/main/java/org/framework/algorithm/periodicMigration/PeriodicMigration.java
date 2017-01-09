@@ -21,7 +21,7 @@ import static org.domain.VirtualMachine.getById;
 /**
  * <b>Algorithm 0: Periodical Migration </b>
  * <p>
- *     Migration is launching periodically.
+ *     Reconfiguration is launching periodically.
  * </p>
  * @author Saul Zalimben.
  * @since 1/1/17.
@@ -37,7 +37,7 @@ public class PeriodicMigration {
     }
 
     /**
-     * VMPManager
+     * Periodic Migration Manager
      * @param workload                   Workload Trace
      * @param physicalMachines           List of Physical Machines
      * @param virtualMachines            List of Virtual Machines
@@ -51,6 +51,7 @@ public class PeriodicMigration {
      * @param timeUnit                   Time init
      * @param requestsProcess            Type of Process
      * @param maxPower                   Maximum Power Consumption
+     * @param scenarioFile               Name of Scenario
      *
      * <b>RequestsProcess</b>:
      *  <ul>
@@ -60,7 +61,9 @@ public class PeriodicMigration {
      *      <li>Requests[3]: violation Number of violation</li>
      *  </ul>
      *
-     * @throws IOException
+     * @throws IOException          Error managing files
+     * @throws InterruptedException Multi-thread error
+     * @throws ExecutionException   Multi-thread error
      */
     public static void periodicMigrationManager(List<Scenario> workload, List<PhysicalMachine> physicalMachines,
             List<VirtualMachine>

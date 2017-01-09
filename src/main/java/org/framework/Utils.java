@@ -240,14 +240,16 @@ public class Utils {
      *      Load Physical Machine Configuration
      *  </li>
      * </ul>
-     * @param scenarioFile    List of Config Files
+     *
+     *
+     * @param pmConfig         CPU Load Configuration
+     * @param scenarioFile     List of Config Files
      * @param physicalMachines List of Physical Machines
      * @param scenarios        Workload Trace
      * @return MaxPower DC
-     * @throws IOException
+     * @throws IOException Error managing files
      */
-    public static Float loadDatacenter(String pmConfig, String scenarioFile, List<PhysicalMachine>
-            physicalMachines,
+    public static Float loadDatacenter(String pmConfig, String scenarioFile, List<PhysicalMachine> physicalMachines,
             List<Scenario> scenarios) throws IOException {
 
         Float maxPower;
@@ -275,6 +277,8 @@ public class Utils {
      *
      * @param file    File name
      * @param toPrint Objective Function
+     *
+     * @throws IOException  Error managing files
      */
     public static void printToFile(String file, Object toPrint) throws IOException {
 
@@ -318,7 +322,7 @@ public class Utils {
 
     /**
      * Clones a List of Float elements
-     * @param floatList List<Float></Float>
+     * @param floatList List of Float numbers
      * @return Copy of floatList
      */
     public static List<Float> getListClone(List<Float> floatList) {
@@ -340,6 +344,8 @@ public class Utils {
      *     <li> Migration Count </li>
      *     <li> Memory Migrated </li>
      * </ul>
+     *
+     * @param timeUnit Time Unit
      *
      * @return List of Apriori Values
      */
@@ -706,7 +712,11 @@ public class Utils {
 	/**
 	 * Makes a forecast of n possible values ​​of f(x) to decide to call or
 	 * not to reconfiguration
-	 * @return true: do reconfiguration or false: don't do reconfiguration
+	 *
+     * @param series        Series
+     * @param forecastSize  Forecast Size
+     *
+     * @return <b>True</b>: do reconfiguration <br> <b>False</b>: don't do reconfiguration
 	 *
 	 */
 	public static Boolean callToReconfiguration(List<Float> series, Integer forecastSize){
@@ -780,8 +790,10 @@ public class Utils {
      *
      * @param pm PhysicalMachine
      * @param vmsInPM List of VMs
+     *
+     * @return List of Virtual Machine to migrate
      */
-    public static List<VirtualMachine> getVMsToMigrate(PhysicalMachine pm, List<VirtualMachine> vmsInPM){
+    public static List<VirtualMachine> getVMsToMigrate(PhysicalMachine pm, List<VirtualMachine> vmsInPM) {
 
         PhysicalMachine pmCopy = new PhysicalMachine(pm.getId(),pm.getPowerMax(),pm.getResources(),pm.getResourcesRequested(),
                 pm.getUtilization());

@@ -7,12 +7,15 @@ import org.framework.Utils;
  */
 public class Initialization {
 
+    private Initialization() {
+        // Default Constructor
+    }
+
     /**
-     *
-     * @param numberOfVMs
-     * @param numberOfPMs
-     * @param maSettings
-     * @return
+     * @param numberOfVMs Number of Virtual Machines
+     * @param numberOfPMs Number of Physical Machines
+     * @param maSettings  MA settings
+     * @return First Population
      */
     public Population initialize( int numberOfVMs, int numberOfPMs, MASettings maSettings){
 
@@ -31,10 +34,9 @@ public class Initialization {
     }
 
     /**
-     *
-     * @param maxPossible
-     * @param includeZero
-     * @return
+     * @param maxPossible Max Value possible
+     * @param includeZero <b>True</b>, if ZERO is included <br> <b>False</b>, otherwise
+     * @return Solution Position
      */
     public int generateSolutionPosition(int maxPossible, boolean includeZero){
 

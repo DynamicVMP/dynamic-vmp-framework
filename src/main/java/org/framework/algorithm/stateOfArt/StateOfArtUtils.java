@@ -11,11 +11,10 @@ import java.util.List;
 public class StateOfArtUtils {
 
     /**
-     *
-     * @param workload
-     * @param memeticTimeInit
-     * @param memeticTimeEnd
-     * @return
+     * @param workload        Workload Scenario
+     * @param memeticTimeInit Memetic Time init
+     * @param memeticTimeEnd  Memetic Time end
+     * @return <b>True</b>, if a VM is requested during migration <br> <b>False</b>, otherwise
      */
     public static boolean newVmDuringMemeticExecution(List<Scenario> workload, Integer memeticTimeInit,
             Integer memeticTimeEnd) {

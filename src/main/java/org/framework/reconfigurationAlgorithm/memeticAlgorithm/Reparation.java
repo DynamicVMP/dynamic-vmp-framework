@@ -13,13 +13,16 @@ import java.util.List;
  */
 public class Reparation {
 
+    private Reparation() {
+        // Default Constructor
+    }
+
     /**
-     *
-     * @param population
-     * @param virtualMachineList
-     * @param physicalMachineList
-     * @param numberOfResources
-     * @return
+     * @param population          Population
+     * @param virtualMachineList  List of allocated Virtual Machine
+     * @param physicalMachineList List of Physical Machine
+     * @param numberOfResources   Number of Resources
+     * @return Population
      */
     public static Population repairPopulation(Population population,List<VirtualMachine> virtualMachineList,List<PhysicalMachine> physicalMachineList,
                                              int numberOfResources){
@@ -37,10 +40,10 @@ public class Reparation {
 
     /**
      *
-     * @param individual
-     * @param individualVmList
-     * @param individualPmList
-     * @param numberOfResources
+     * @param individual Individual
+     * @param individualVmList List of Virtual Machine in Individual
+     * @param individualPmList List of Physical Machine in Individual
+     * @param numberOfResources Number of Resources
      */
     public static void checkAndRepair(Individual individual,List<VirtualMachine> individualVmList, List<PhysicalMachine> individualPmList,
                                      int numberOfResources){
@@ -71,10 +74,10 @@ public class Reparation {
      * @param virtualMachineList List of Virtual Machines
      * @param physicalMachineList List of Physical Machines
      * @param numberOfResources Number of Resources
-     * @return
+     * @return <b>True</b>, move was success <br> <b>False</b>, otherwise
      */
-    private static Boolean moveVM(Individual individual,int iteratorSolution, VirtualMachine vm,List<VirtualMachine> virtualMachineList, List<PhysicalMachine> physicalMachineList,
-                                  int numberOfResources){
+    private static Boolean moveVM(Individual individual,int iteratorSolution, VirtualMachine vm,
+            List<VirtualMachine> virtualMachineList, List<PhysicalMachine> physicalMachineList, int numberOfResources) {
 
         int pmIdCandidate;
         int iteratorPhysical;

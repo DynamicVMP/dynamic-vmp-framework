@@ -12,11 +12,15 @@ import java.util.List;
  */
 public class Evolution {
 
+    private Evolution() {
+        // Default Constructor
+    }
+
     /**
      *
-     * @param populationP
-     * @param populationQ
-     * @return
+     * @param populationP Population P
+     * @param populationQ Population Q
+     * @return New Generation of Population
      */
     public static Population getNextGeneration(Population populationP, Population populationQ) {
 

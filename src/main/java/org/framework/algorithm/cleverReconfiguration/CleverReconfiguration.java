@@ -34,10 +34,8 @@ public class CleverReconfiguration {
         // Default Constructor
     }
 
-
-
     /**
-     * VMPManager
+     * Clever Reconfiguration VMP
      * @param workload                   Workload Trace
      * @param physicalMachines           List of Physical Machines
      * @param virtualMachines            List of Virtual Machines
@@ -51,6 +49,7 @@ public class CleverReconfiguration {
      * @param timeUnit                   Time init
      * @param requestsProcess            Type of Process
      * @param maxPower                   Maximum Power Consumption
+     * @param scenarioFile               Name of Scenario
      *
      * <b>RequestsProcess</b>:
      *  <ul>
@@ -60,7 +59,9 @@ public class CleverReconfiguration {
      *      <li>Requests[3]: violation Number of violation</li>
      *  </ul>
      *
-     * @throws IOException
+     * @throws IOException          Error managing files
+     * @throws InterruptedException Multi-thread error
+     * @throws ExecutionException   Multi-thread error
      */
     public static void cleverReconfigurationgManager(List<Scenario> workload, List<PhysicalMachine> physicalMachines,
             List<VirtualMachine>
