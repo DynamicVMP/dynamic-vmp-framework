@@ -35,6 +35,8 @@ import static java.nio.file.Files.*;
 public class Utils {
 
     public static final String OUTPUT = "outputs/";
+    public static final String PLACEMENT_SCORE_BY_TIME = "placement_score_by_time/";
+
     public static final String INPUT = "inputs/";
 
     public static final String SUM = "SUM";
@@ -729,7 +731,7 @@ public class Utils {
 		for(Float n : listNumbers ){
 			sum+=n;
 		}
-		return listNumbers.isEmpty()? 0 : sum/listNumbers.size();
+		return listNumbers.isEmpty() ? 0 : sum/listNumbers.size();
 	}
 
 	/**

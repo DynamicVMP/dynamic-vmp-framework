@@ -231,11 +231,11 @@ public class DynamicVMP {
         ArrayList<String> scenariosFiles  = new ArrayList<>();
         loadParameters(scenariosFiles, args[0]);
 
-        logger.log(Level.INFO, "STARTING EXPERIMENTS");
+        logger.log(Level.INFO, "EXECUTING EXPERIMENTS");
 
         for (String scenarioFile : scenariosFiles) {
             // For debug only
-            // logger.log(Level.FINE, scenarioFile);
+            // logger.log(Level.INFO, scenarioFile);
             launchExperiments(Parameter.HEURISTIC_CODE, Parameter.PM_CONFIG, scenarioFile);
         }
         logger.log(Level.INFO, "ENDING EXPERIMENTS");
@@ -275,8 +275,8 @@ public class DynamicVMP {
         Integer[] requestsProcess = initRequestProcess();
         Float[] realRevenue = new Float[]{0F};
 
-        Files.write(Paths.get(scenarioFile), scenarioFile.getBytes(), StandardOpenOption
-                .CREATE);
+        Files.write(Paths.get(Utils.OUTPUT + Utils.PLACEMENT_SCORE_BY_TIME + scenarioFile),
+                (scenarioFile + "\n" ).getBytes(), StandardOpenOption.CREATE);
 
         // LIST
         List<Resources> wastedResources = new ArrayList<>();
@@ -288,6 +288,12 @@ public class DynamicVMP {
         maxPower = Utils.loadDatacenter(pmConfig, scenarioFile, physicalMachines, scenarios);
         timeSimulated = scenarios.get(scenarios.size() - 1).getTime();
         Integer code = Constant.HEURISTIC_MAP.get(heuristicCode);
+
+        // Check if the algorithm is valid!
+        if(code == null) {
+            logger.log(Level.SEVERE, "Is not a valid algorithm!");
+            return;
+        }
 
         Integer timeUnit = scenarios.get(0).getTime();
         initialTimeUnit = timeUnit;
@@ -339,7 +345,7 @@ public class DynamicVMP {
                 wastedResources.add(new Resources());
                 wastedResourcesRatioByTime.put(timeAdjust, 0F);
                 revenueByTime.put(timeAdjust, 0F);
-                Utils.printToFile(scenarioFile, 0);
+                Utils.printToFile(Utils.OUTPUT + Utils.PLACEMENT_SCORE_BY_TIME + scenarioFile, 0);
                 timeAdjust++;
                 timeSimulated += 1;
             }

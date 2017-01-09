@@ -115,7 +115,7 @@ public class PeriodicMigration {
                         maxPower, powerByTime, revenueByTime, wastedResourcesRatioByTime);
 
                 // Print the Placement Score by Time t
-                Utils.printToFile(scenarioFile, placementScore);
+                Utils.printToFile( Utils.OUTPUT + Utils.PLACEMENT_SCORE_BY_TIME + scenarioFile, placementScore);
 
                 timeUnit = actualTimeUnit;
 

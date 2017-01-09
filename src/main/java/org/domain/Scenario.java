@@ -165,13 +165,13 @@ public class Scenario implements Comparable<Scenario> {
         representativeWeightB = requestB.getRevenue().totalRevenue();
 
         if (representativeWeightA > representativeWeightB) {
-            return 1;
+            return -1;
         } else if (representativeWeightA.equals(representativeWeightB)) {
             return 0;
         }
 
         // B is better than A
-        return -1;
+        return 1;
     }
 
     /**
@@ -212,7 +212,7 @@ public class Scenario implements Comparable<Scenario> {
         System.out.print(this.getUtilization().getCpu() + "\t");
         System.out.print(this.getUtilization().getRam() + "\t");
         System.out.print(this.getUtilization().getNet() + "\t");
-        System.out.print(this.getRevenue() + "\t");
+        System.out.print(this.getRevenue().totalRevenue() + "\t");
         System.out.print(this.getTinit() + "\t");
         System.out.print(this.getTend());
         System.out.println();
