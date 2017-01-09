@@ -22,7 +22,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.domain.VirtualMachine.getById;
+
 /**
+ * Heuristics Code.
+ * <p>
+ *     All heuristic's logic is here
+ * </p>
  * @author Saul Zalimben.
  * @since 8/15/16.
  */
@@ -59,7 +65,10 @@ public class Heuristics {
 
 
     /**
-     * Update VM
+     * Update VM (allocated and derived).
+     * <p>
+     *     Update the resources and utilization of the VM and the it's PM host
+     * </p>
      * @param s                    Scenario
      * @param virtualMachines      Virtual Machines
      * @param derivedVMs           List of Derived Virtual Machine
@@ -84,34 +93,34 @@ public class Heuristics {
             utilization = s.getUtilization();
         }
 
+        // Instance a VM (updateVM)
         VirtualMachine updatedVM = new VirtualMachine(s.getVirtualMachineID(), s.getResources(), s.getRevenue(),
                 s.getTinit(), s.getTend(), utilization, s.getDatacenterID(), s.getCloudServiceID(), null);
 
-        // TODO: refactorizar getVMbyID
-        for (VirtualMachine vm : virtualMachines) {
+        // Search allocated VM
+        VirtualMachine vm = getById(updatedVM.getId(), virtualMachines);
+
+        // Check if VM was allocated
+        if(vm != null) {
+            // Get PM host
             physicalMachine = PhysicalMachine.getById(vm.getPhysicalMachine(), physicalMachines);
-            if (updatedVM.equals(vm) && physicalMachine != null) {
-
-                if (Constraints.checkResources(physicalMachine, vm, updatedVM, virtualMachines,true)) {
-
-                    for (int k = 0; k < physicalMachine.getResources().size(); k++) {
-                        physicalMachine.updateResource(k, vm.getResources().get(k) * vm.getUtilization().get(k)/100,
-                                Utils.SUB);
-                    }
-
-                    updateVmResources(virtualMachines, updatedVM);
-                    allocateVMToPM(updatedVM, physicalMachine);
-                    return true;
-                } else {
-                    getViolation(s.getTime(), vm, updatedVM, physicalMachine);
-                    return false;
+            // Check resources
+            if (Constraints.checkResources(physicalMachine, vm, updatedVM, virtualMachines,true)) {
+                // Update allocated VM
+                for (int k = 0; k < physicalMachine.getResources().size(); k++) {
+                    physicalMachine.updateResource(k, vm.getResources().get(k) * vm.getUtilization().get(k)/100,
+                            Utils.SUB);
                 }
+                updateVmResources(virtualMachines, updatedVM);
+                allocateVMToPM(updatedVM, physicalMachine);
+                return true;
             } else {
-                // This means that the VM was allocated in other Datacenter that belongs to the same Federation Cloud
-                success = true;
+                getViolation(s.getTime(), vm, updatedVM, physicalMachine);
+                return false;
             }
         }
 
+        // If VM is not allocated
         for(VirtualMachine derivedVM : derivedVMs){
             if(updatedVM.equals(derivedVM)) {
                 updateVmResources(derivedVMs, updatedVM);
@@ -122,7 +131,10 @@ public class Heuristics {
     }
 
     /**
-     * Allocate a VM to a PM
+     * Allocate VM to PM
+     * <p>
+     *     Update the resources and utilization of the PM
+     * </p>
      * @param vm Virtual Machine
      * @param pm Physical Machine
      */
@@ -136,7 +148,11 @@ public class Heuristics {
     }
 
     /**
-     * Return the penalty for SLA Violation
+     * Calculate the penalty for SLA Violation
+     * <p>
+     *     Register the VM, time and what resource was violated
+     * </p>
+     *
      * @param timeViolation Time Violation
      * @param oldVm         Virtual Machine (previous version of Virtual Machine)
      * @param vm            Virtual Machine (new version of Virtual Machine)
@@ -201,6 +217,7 @@ public class Heuristics {
 
     /**
      * Remove VM when its lifetime expired
+     *
      * @param virtualMachines  List of VMs
      * @param timeUnit         Current time
      * @param physicalMachines List of Physical Machines
@@ -259,21 +276,21 @@ public class Heuristics {
             return true;
         }
         // Set PM for derived VM to null
-
         derivedVMs.add(vm);
         return false;
     }
 
     /**
+     * Allocate VM To DC
      * @param vm                VirtualMachine
      * @param physicalMachines List of PM
      * @param virtualMachines  List of VM
      * @return <b>True</b>, if DC can host the VM <br> <b>False</b>, otherwise
      */
-    private static boolean allocateVMToDC(VirtualMachine vm, final List<PhysicalMachine> physicalMachines,
+    private static boolean allocateVMToDC(final VirtualMachine vm, final List<PhysicalMachine> physicalMachines,
             final List<VirtualMachine> virtualMachines) {
 
-        // If the VM is new, we set the utilization to 100%, we don't know this information apriori
+        // If the VM is new, we set the utilization to 100%, we don't know this information a priori.
         Resources uti = new Resources(100F, 100F, 100F);
         vm.setUtilization(Arrays.asList(uti.getCpu(),uti.getRam(),uti.getNet()));
 

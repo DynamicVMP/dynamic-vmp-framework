@@ -10,7 +10,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
+
+import static org.domain.VirtualMachine.getById;
 
 /**
  *
@@ -43,7 +44,6 @@ public class ThresholdBasedApproach {
      * @param timeUnit                   Time init
      * @param requestsProcess            Type of Process
      * @param maxPower                   Maximum Power Consumption
-     * @param realRevenue                Revenue
      *
      * <b>RequestsProcess</b>:
      *  <ul>
@@ -60,7 +60,7 @@ public class ThresholdBasedApproach {
             virtualMachines, List<VirtualMachine> derivedVMs,
             Map<Integer, Float> revenueByTime, List<Resources> wastedResources,  Map<Integer, Float> wastedResourcesRatioByTime,
             Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
-            Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
+            Integer[] requestsProcess, Float maxPower, String scenarioFile)
             throws IOException, InterruptedException, ExecutionException {
 
         List<VirtualMachine> vmsToMigrateFromPM = new ArrayList<>();
@@ -87,11 +87,14 @@ public class ThresholdBasedApproach {
             if (nextTimeUnit!= -1 && isMigrationActive && DynamicVMP.isVmBeingMigrated(request.getVirtualMachineID(),
                     vmsToMigrate)){
 
-                VirtualMachine vmMigrating = VirtualMachine.getById(request.getVirtualMachineID(),virtualMachines);
-                if(vmMigrating != null) {
-                    vmEndTimeMigration = Utils.getEndTimeMigrationByVm(vmMigrating.getId(),vmsToMigrate,vmsMigrationEndTimes);
-                }
-                //check the migration time of the vm considered. If the vm is being migrated, a utilization overhead is added.
+                VirtualMachine vmMigrating = getById(request.getVirtualMachineID(),virtualMachines);
+                vmEndTimeMigration = Utils.updateVmEndTimeMigration(vmsToMigrate, vmsMigrationEndTimes,
+                        vmEndTimeMigration,
+                        vmMigrating);
+
+                /* Check the migration time of the vm considered. If the vm is being migrated, a utilization overhead
+                 * is added.
+                 */
                 isUpdateVmUtilization = actualTimeUnit <= vmEndTimeMigration;
             }
 

@@ -37,7 +37,7 @@ public class DynamicVMP {
                 List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs,
                 Map<Integer, Float> revenueByTime, List<Resources> wastedResources,  Map<Integer, Float> wastedResourcesRatioByTime,
                 Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
-                Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
+                Integer[] requestsProcess, Float maxPower, String scenarioFile)
                 throws IOException, InterruptedException, ExecutionException;
     }
 
@@ -119,6 +119,7 @@ public class DynamicVMP {
             List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs, Integer[] requests,
             Boolean isMigrationActive) {
 
+        // By default Physical Machine is null
         VirtualMachine vm = new VirtualMachine(s.getVirtualMachineID(), s.getResources(), s.getRevenue(),
                 s.getTinit(), s.getTend(), s.getUtilization(),
                 s.getDatacenterID(), s.getCloudServiceID(), null);
@@ -279,7 +280,7 @@ public class DynamicVMP {
     public static void main (String[] args) throws IOException, InterruptedException, ExecutionException {
 
         ArrayList<String> scenariosFiles  = new ArrayList<>();
-        if(!(args.length > 0)) {
+        if(0 == args.length) {
             logger.log(Level.INFO, "Some arguments are missing!");
         }
         String parameterFile = args[0];
@@ -365,7 +366,7 @@ public class DynamicVMP {
             getAlgorithms()[Parameter.ALGORITHM]
                     .useAlgorithm(scenarios, physicalMachines, virtualMachines, derivedVMs,
                             revenueByTime, wastedResources, wastedResourcesRatioByTime, powerByTime,
-                            placements, code, timeUnit, requestsProcess, maxPower, realRevenue, scenarioFile);
+                            placements, code, timeUnit, requestsProcess, maxPower, scenarioFile);
         } catch (ArrayIndexOutOfBoundsException e) {
             logger.log(Level.SEVERE, "Is not a valid algorithm!");
             throw e;

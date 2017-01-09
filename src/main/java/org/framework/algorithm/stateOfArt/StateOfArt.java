@@ -1,7 +1,10 @@
 package org.framework.algorithm.stateOfArt;
 
 import org.domain.*;
-import org.framework.*;
+import org.framework.Constant;
+import org.framework.DynamicVMP;
+import org.framework.ObjectivesFunctions;
+import org.framework.Utils;
 import org.framework.reconfigurationAlgorithm.concurrent.StaticReconfMemeCall;
 import org.framework.reconfigurationAlgorithm.memeticAlgorithm.MASettings;
 
@@ -12,6 +15,8 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.domain.VirtualMachine.getById;
 
 /**
  * <b>Algorithm 1: Periodic Migration (StateOfArt)</b>
@@ -24,18 +29,18 @@ import java.util.logging.Logger;
  */
 public class StateOfArt {
 
+    private static Logger logger = DynamicVMP.getLogger();
+
     private StateOfArt() {
         // Default Constructor
     }
-
-    private static Logger logger = DynamicVMP.getLogger();
 
     public static void stateOfArtManager(List<Scenario> workload, List<PhysicalMachine> physicalMachines,
             List<VirtualMachine>
             virtualMachines, List<VirtualMachine> derivedVMs,
             Map<Integer, Float> revenueByTime, List<Resources> wastedResources,  Map<Integer, Float> wastedResourcesRatioByTime,
             Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
-            Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
+            Integer[] requestsProcess, Float maxPower, String scenarioFile)
             throws IOException, InterruptedException, ExecutionException {
 
         List<APrioriValue> aPrioriValuesList = new ArrayList<>();
@@ -69,11 +74,11 @@ public class StateOfArt {
             if (nextTimeUnit!= -1 && isMigrationActive && DynamicVMP.isVmBeingMigrated(request.getVirtualMachineID(),
                     vmsToMigrate)){
 
-                // TODO: Check why this is null in some scenarios
-                VirtualMachine vmMigrating = VirtualMachine.getById(request.getVirtualMachineID(),virtualMachines);
-                if(vmMigrating != null) {
-                    vmEndTimeMigration = Utils.getEndTimeMigrationByVm(vmMigrating.getId(),vmsToMigrate,vmsMigrationEndTimes);
-                }
+                VirtualMachine vmMigrating = getById(request.getVirtualMachineID(),virtualMachines);
+
+                vmEndTimeMigration = Utils.updateVmEndTimeMigration(vmsToMigrate, vmsMigrationEndTimes,
+                        vmEndTimeMigration,
+                        vmMigrating);
 
                 isUpdateVmUtilization = actualTimeUnit <= vmEndTimeMigration;
             }
@@ -100,6 +105,7 @@ public class StateOfArt {
                         VirtualMachine.cloneVMsList(derivedVMs), placementScore);
                 placements.put(actualTimeUnit, heuristicPlacement);
 
+                // Take a snapshot of the current placement to launch reconfiguration
                 if(nextTimeUnit!=-1 && nextTimeUnit.equals(memeticTimeInit)){
 
                     // If a new VM request cames while memetic execution, memetic algorithm is cancel.
@@ -109,22 +115,27 @@ public class StateOfArt {
                         memeticTimeInit = memeticTimeInit + memeConfig.getExecutionInterval();
                     } else {
 
-                        if (virtualMachines.size() != 0) {
+                        if(!virtualMachines.isEmpty()) {
+
+                            // Get the list of a priori values
+                            aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
+
                             // Clone the current placement
                             Placement memeticPlacement = new Placement(PhysicalMachine.clonePMsList(physicalMachines),
                                     VirtualMachine.cloneVMsList(virtualMachines),
                                     VirtualMachine.cloneVMsList(derivedVMs));
 
-                            //get the list of a priori values
-                            aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
-                            //config the call for the memetic algorithm
+                            // Config the call for the memetic algorithm
                             staticReconfgTask = new StaticReconfMemeCall(memeticPlacement, aPrioriValuesList,
                                     memeConfig);
-                            //call the memetic algorithm in a separate thread
+
+                            // Call the memetic algorithm in a separate thread
                             reconfgResult = executorService.submit(staticReconfgTask);
-                            //update the time end of the memetic algorithm execution
+
+                            // Update the time end of the memetic algorithm execution
                             memeticTimeEnd = memeticTimeInit + memeConfig.getExecutionDuration();
-                            //update the migration init time
+
+                            // Update the migration init time
                             migrationTimeInit = memeticTimeEnd + 1;
 
                         } else {
@@ -164,25 +175,31 @@ public class StateOfArt {
                     }
 
                 } else if(nextTimeUnit != -1 && actualTimeUnit.equals(migrationTimeEnd)) {
-					/* get here the new virtual machines to insert in the placement generated by the
-		            memetic algorithm using Best Fit Decreasing */
-                    isMigrationActive = false;
+					/* Get here the new virtual machines to insert in the placement generated by the
+		             * memetic algorithm using Best Fit Decreasing
+		             */
 
-                    //update de virtual machine list of the placement after the migration operation
+                    // Update de virtual machine list of the placement after the migration operation (remove VMs)
                     Utils.removeDeadVMsFromPlacement(reconfgPlacementResult,actualTimeUnit,memeConfig.getNumberOfResources());
-                    //update the placement score after filtering dead  virtual machines.
-                    reconfgPlacementResult.updatePlacementScore(aPrioriValuesList);
 
+                    /* Update de virtual machine list of the placement after the migration operation, update VMs
+                     * resources and add new VMs
+                     */
                     Placement memeticPlacement = DynamicVMP.updatePlacementAfterReconf(workload, Constant.BFD,
                             reconfgPlacementResult,
                             memeticTimeInit,
                             migrationTimeEnd);
+
+                    // Update the placement score after filtering dead  virtual machines.
+                    reconfgPlacementResult.updatePlacementScore(aPrioriValuesList);
 
                     if(DynamicVMP.isMememeticPlacementBetter(placements.get(actualTimeUnit), memeticPlacement)) {
                         physicalMachines = new ArrayList<>(memeticPlacement.getPhysicalMachines());
                         virtualMachines = new ArrayList<>(memeticPlacement.getVirtualMachineList());
                         derivedVMs = new ArrayList<>(memeticPlacement.getDerivedVMs());
                     }
+                    // Set Migration Active
+                    isMigrationActive = false;
                 }
             }
         }

@@ -802,6 +802,29 @@ public class Utils {
         return vmsToMigrate;
     }
 
+    /**
+     * Update End Time Migration
+     * @param vmsToMigrate         List of VMs to migrate
+     * @param vmsMigrationEndTimes End time migration (per VM)
+     * @param vmEndTimeMigration   End time of all migrations
+     * @param vmMigrating          VM to migrate
+     * @return newEndTimeMigration
+     */
+    public static Integer updateVmEndTimeMigration(final List<VirtualMachine> vmsToMigrate,
+            final List<Integer> vmsMigrationEndTimes, Integer vmEndTimeMigration,
+            final VirtualMachine vmMigrating) {
+
+        Integer newEndTimeMigration;
+
+        if(vmMigrating != null) {
+            newEndTimeMigration = Utils.getEndTimeMigrationByVm(vmMigrating.getId(),vmsToMigrate,vmsMigrationEndTimes);
+        } else {
+            newEndTimeMigration = vmEndTimeMigration;
+        }
+
+        return newEndTimeMigration;
+    }
+
 
 
 }

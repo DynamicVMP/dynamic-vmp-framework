@@ -43,7 +43,6 @@ public class ObjectivesFunctions {
      * Minimum Revenue is 0 (All VMs are served)
      */
     static final Float MIN_REVENUE = 0F;
-    static final Float WSConstant = 0.25F;
 
     private ObjectivesFunctions() {
         // Default Constructor
@@ -352,6 +351,11 @@ public class ObjectivesFunctions {
     }
 
     /**
+     * Get the Current Score of the Placement
+     * <p>
+     *     Normalize objective functions values and use {@link Parameter#SCALARIZATION_METHOD} to combined them into
+     *     one value. (the placement score)
+     * </p>
      * @param timeUnit                   TimeUnit
      * @param wastedResourcesRatioByTime WastedResourcesRatio per time t
      * @param powerByTime                Power Consumption per time t

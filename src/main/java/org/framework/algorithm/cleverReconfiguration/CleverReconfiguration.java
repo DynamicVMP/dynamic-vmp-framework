@@ -13,6 +13,8 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.domain.VirtualMachine.getById;
+
 /**
  * <b>Algorithm 3: Recalculation-based VMPr Recovering</b>
  * <p>
@@ -26,11 +28,13 @@ import java.util.logging.Logger;
  */
 public class CleverReconfiguration {
 
+    private static Logger logger = DynamicVMP.getLogger();
+
     private CleverReconfiguration() {
         // Default Constructor
     }
 
-    private static Logger logger = DynamicVMP.getLogger();
+
 
     /**
      * VMPManager
@@ -47,7 +51,6 @@ public class CleverReconfiguration {
      * @param timeUnit                   Time init
      * @param requestsProcess            Type of Process
      * @param maxPower                   Maximum Power Consumption
-     * @param realRevenue                Revenue
      *
      * <b>RequestsProcess</b>:
      *  <ul>
@@ -64,7 +67,7 @@ public class CleverReconfiguration {
             virtualMachines, List<VirtualMachine> derivedVMs,
             Map<Integer, Float> revenueByTime, List<Resources> wastedResources,  Map<Integer, Float> wastedResourcesRatioByTime,
             Map<Integer, Float> powerByTime, Map<Integer, Placement> placements, Integer code, Integer timeUnit,
-            Integer[] requestsProcess, Float maxPower, Float[] realRevenue, String scenarioFile)
+            Integer[] requestsProcess, Float maxPower, String scenarioFile)
             throws IOException, InterruptedException, ExecutionException {
 
         List<APrioriValue> aPrioriValuesList = new ArrayList<>();
@@ -101,19 +104,19 @@ public class CleverReconfiguration {
             if (nextTimeUnit!= -1 && isMigrationActive && DynamicVMP.isVmBeingMigrated(request.getVirtualMachineID(),
                     vmsToMigrate)){
 
-                // TODO: Check why this is null in some scenarios
-                VirtualMachine vmMigrating = VirtualMachine.getById(request.getVirtualMachineID(),virtualMachines);
-                if(vmMigrating != null) {
-                    vmEndTimeMigration = Utils.getEndTimeMigrationByVm(vmMigrating.getId(),vmsToMigrate,vmsMigrationEndTimes);
-                }
+                VirtualMachine vmMigrating = getById(request.getVirtualMachineID(),virtualMachines);
+                vmEndTimeMigration = Utils.updateVmEndTimeMigration(vmsToMigrate, vmsMigrationEndTimes,
+                        vmEndTimeMigration,
+                        vmMigrating);
 
                 isUpdateVmUtilization = actualTimeUnit <= vmEndTimeMigration;
             }
 
             DynamicVMP.runHeuristics(request, code, physicalMachines, virtualMachines, derivedVMs, requestsProcess, isUpdateVmUtilization);
 
-            // check if its the last request or a variation of time unit will occurs.
+            // Check if its the last request or a variation of time unit will occurs.
             if (nextTimeUnit == -1 || !actualTimeUnit.equals(nextTimeUnit)) {
+
                 ObjectivesFunctions.getObjectiveFunctionsByTime(physicalMachines,
                         virtualMachines, derivedVMs, wastedResources,
                         wastedResourcesRatioByTime, powerByTime, revenueByTime, timeUnit, actualTimeUnit);
@@ -133,10 +136,11 @@ public class CleverReconfiguration {
                         VirtualMachine.cloneVMsList(derivedVMs), placementScore);
                 placements.put(actualTimeUnit, heuristicPlacement);
 
-                //check the historical information
+                // Check the historical information
                 if(nextTimeUnit!=-1 && placements.size() > Parameter.HISTORICAL_DATA_SIZE &&
                         !isReconfigurationActive && !isMigrationActive ){
-                    //collect O.F. historical values
+
+                    // Collect O.F. historical values
                     valuesSelectedForecast.clear();
                     for(int timeIterator = nextTimeUnit - Parameter.HISTORICAL_DATA_SIZE; timeIterator<=actualTimeUnit;
                             timeIterator++){
@@ -147,7 +151,7 @@ public class CleverReconfiguration {
                         }
                     }
 
-                    //check if a  call for reconfiguration is needed and set the init time
+                    // Check if a  call for reconfiguration is needed and set the init time
                     if(Utils.callToReconfiguration(valuesSelectedForecast, Parameter.FORECAST_SIZE)){
                         Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE,nextTimeUnit);
                         memeticTimeInit = nextTimeUnit;
@@ -157,25 +161,32 @@ public class CleverReconfiguration {
                     }
                 }
 
+                // Take a snapshot of the current placement to launch reconfiguration
                 if(nextTimeUnit!=-1 && nextTimeUnit.equals(memeticTimeInit)){
 
                     memeticTimeInit = nextTimeUnit;
-                    if(!virtualMachines.isEmpty()){
+                    if(!virtualMachines.isEmpty()) {
+
+                        // Get the list of a priori values
+                        aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
+
                         // Clone the current placement
                         Placement memeticPlacement = new Placement(PhysicalMachine.clonePMsList(physicalMachines),
                                 VirtualMachine.cloneVMsList(virtualMachines),
                                 VirtualMachine.cloneVMsList(derivedVMs));
 
-                        //get the list of a priori values
-                        aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
-                        //config the call for the memetic algorithm
-                        staticReconfgTask = new StaticReconfMemeCall(memeticPlacement,aPrioriValuesList,
-                                memeConfig);
-                        //call the memetic algorithm in a separate thread
+
+                        // Config the call for the memetic algorithm
+                        staticReconfgTask = new StaticReconfMemeCall(memeticPlacement,aPrioriValuesList,memeConfig);
+
+                        // Call the memetic algorithm in a separate thread
                         reconfgResult = executorService.submit(staticReconfgTask);
-                        //update the time end of the memetic algorithm execution
+
+                        // Update the time end of the memetic algorithm execution
+
                         memeticTimeEnd = memeticTimeInit + memeConfig.getExecutionDuration();
-                        //update the migration init time
+
+                        // Update the migration init time
                         migrationTimeInit = memeticTimeEnd+1;
 
                     }else{
@@ -214,6 +225,7 @@ public class CleverReconfiguration {
 					/* Get here the new virtual machines to insert in the placement generated by the
 		             * memetic algorithm using Best Fit Decreasing
 		             */
+                    // Set Migration and Reconfiguration Active
                     isMigrationActive = false;
                     isReconfigurationActive = false;
 

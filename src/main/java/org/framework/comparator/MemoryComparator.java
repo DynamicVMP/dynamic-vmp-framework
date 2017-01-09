@@ -5,6 +5,8 @@ import org.domain.VirtualMachine;
 import java.util.Comparator;
 
 /**
+ * Compares {@link VirtualMachine} bt Memory
+ *
  * @author Saul Zalimben.
  * @since 12/31/16.
  */

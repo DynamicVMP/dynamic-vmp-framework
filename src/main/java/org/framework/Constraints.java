@@ -124,7 +124,7 @@ public class Constraints {
 
     /**
      *
-     * @param pm
+     * @param pm PhysicalMachine
      * @return <b>True</b>, if PM is Overloaded <br> <b>False</b>, otherwise
      */
     public static Boolean isPMOverloaded(PhysicalMachine pm){

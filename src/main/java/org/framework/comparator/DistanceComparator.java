@@ -6,6 +6,7 @@ import org.framework.reconfigurationAlgorithm.memeticAlgorithm.Individual;
 import java.util.Comparator;
 
 /**
+ * Compares {@link Individual} by Fitness
  * @author Leonardo Benitez.
  */
 public class DistanceComparator implements FitnessComparator, Comparator<Individual>{

@@ -23,13 +23,14 @@ import org.domain.PhysicalMachine;
 import java.util.Comparator;
 
 /**
+ * Compares {@link PhysicalMachine} by Weight (Best Comparator)
  * @author Saul Zalimben.
  * @since 8/28/16.
  */
 public class BestComparator implements Comparator<PhysicalMachine> {
 
     public BestComparator() {
-
+        // Default Constructor
     }
 
     @Override

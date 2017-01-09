@@ -212,8 +212,10 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
 
         VirtualMachine vm = (VirtualMachine) obj;
 
-        return vm != null && this.getCloudService().equals(vm.getCloudService()) &&
-                this.getDatacenter().equals(vm.getDatacenter()) && this.getId().equals(vm.getId());
+        return vm != null
+                && this.getCloudService().equals(vm.getCloudService())
+                && this.getDatacenter().equals(vm.getDatacenter())
+                && this.getId().equals(vm.getId());
 
     }
 
