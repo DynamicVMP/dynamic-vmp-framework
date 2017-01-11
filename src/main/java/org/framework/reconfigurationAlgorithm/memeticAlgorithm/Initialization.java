@@ -7,10 +7,6 @@ import org.framework.Utils;
  */
 public class Initialization {
 
-    private Initialization() {
-        // Default Constructor
-    }
-
     /**
      * @param numberOfVMs Number of Virtual Machines
      * @param numberOfPMs Number of Physical Machines
