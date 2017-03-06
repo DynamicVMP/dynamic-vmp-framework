@@ -24,6 +24,11 @@ public class Constant {
     public static final String LEASING_COSTS_FILE = Utils.OUTPUT + "leasing_costs";
 
     /**
+     * Not a constant but once is setted, is used as
+     */
+    public static String EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME;
+
+    /**
      * Heuristics Algorithms
      */
     public static final String BFD = "BFD";

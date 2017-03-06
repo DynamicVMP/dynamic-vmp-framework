@@ -93,9 +93,9 @@ public class ObjectivesFunctions {
                 resources = violation.getResourcesViolated().get(timeUnit);
                 // Get Violated Resources
                 if(resources != null) {
-                    violationRevenue += resources.getCpu() * vm.getRevenue().getCpu();
-                    violationRevenue += resources.getRam() * vm.getRevenue().getRam();
-                    violationRevenue += resources.getNet() * vm.getRevenue().getNet();
+                    violationRevenue += resources.getCpu() * vm.getRevenue().getCpu() * Parameter.PENALTY_FACTOR.get(0);
+                    violationRevenue += resources.getRam() * vm.getRevenue().getRam() * Parameter.PENALTY_FACTOR.get(1);
+                    violationRevenue += resources.getNet() * vm.getRevenue().getNet() * Parameter.PENALTY_FACTOR.get(2);
                 }
                 totalRevenue += violationRevenue;
                 violationRevenue = 0F;

@@ -1,5 +1,7 @@
 package org.framework;
 
+import java.util.List;
+
 /**
  * DynamicVMP Framework: Parameters
  * @author Saul Zalimben.
@@ -53,7 +55,9 @@ public class Parameter {
      *     </li>
      * </ul>
      */
-    public static Float PROTECTION_FACTOR;
+    public static List<Float> PROTECTION_FACTOR;
+
+    public static List<Float> PENALTY_FACTOR;
 
     /**
      * Interval Execution Memetic Algorithm
