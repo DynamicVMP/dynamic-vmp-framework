@@ -11,6 +11,7 @@ package org.framework;
 
 import org.domain.*;
 import org.framework.comparator.MemoryComparator;
+import org.framework.reconfigurationAlgorithm.acoAlgorithm.AcoSettings;
 import org.framework.reconfigurationAlgorithm.enums.ResourcesEnum;
 import org.framework.reconfigurationAlgorithm.memeticAlgorithm.MASettings;
 
@@ -663,6 +664,11 @@ public class Utils {
         Parameter.HISTORICAL_DATA_SIZE = Integer.parseInt( (String) parameterMap.get("HISTORICAL_DATA_SIZE"));
         Parameter.FORECAST_SIZE =Integer.parseInt( (String)  parameterMap.get("FORECAST_SIZE"));
         Parameter.SCALARIZATION_METHOD = (String) parameterMap.get("SCALARIZATION_METHOD");
+        Parameter.MAX_PHEROMONE = new Float((String) parameterMap.get("MAX_PHEROMONE"));
+        Parameter.PHEROMONE_CONSTANT = new Float((String) parameterMap.get("PHEROMONE_CONSTANT"));
+        Parameter.N_ANTS = Integer.parseInt((String) parameterMap.get("N_ANTS"));
+        Parameter.ACO_ITERATIONS = Integer.parseInt((String) parameterMap.get("ACO_ITERATIONS"));
+        Parameter.VMPR_ALGORITHM = (String) parameterMap.get("VMPR_ALGORITHM");
 
         prepareFilesSuffix();
 
@@ -880,6 +886,22 @@ public class Utils {
         }
 
         return newEndTimeMigration;
+    }
+
+
+    /**
+     * Obtain the configuration for Aco algorithm
+     * @return A settings instance of the Aco algorithm
+     */
+    public static AcoSettings getAcoSettings(){
+        AcoSettings acoSettings = new AcoSettings();
+
+        acoSettings.setMaxPheromone(Parameter.MAX_PHEROMONE);
+        acoSettings.setPheromoneConstant(Parameter.PHEROMONE_CONSTANT);
+        acoSettings.setnAnts(Parameter.N_ANTS);
+        acoSettings.setAcoIterations(Parameter.ACO_ITERATIONS);
+
+        return acoSettings;
     }
 
 

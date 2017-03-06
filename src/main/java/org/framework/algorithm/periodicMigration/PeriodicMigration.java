@@ -1,10 +1,8 @@
 package org.framework.algorithm.periodicMigration;
 
 import org.domain.*;
-import org.framework.Constant;
-import org.framework.DynamicVMP;
-import org.framework.ObjectivesFunctions;
-import org.framework.Utils;
+import org.framework.*;
+import org.framework.reconfigurationAlgorithm.acoAlgorithm.AcoCall;
 import org.framework.reconfigurationAlgorithm.concurrent.StaticReconfMemeCall;
 import org.framework.reconfigurationAlgorithm.memeticAlgorithm.MASettings;
 
@@ -147,9 +145,14 @@ public class PeriodicMigration {
                         // Get the list of a priori values
                         aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
 
-                        // Config the call for the memetic algorithm
-                        staticReconfgTask = new StaticReconfMemeCall(memeticPlacement,aPrioriValuesList,
-                                memeConfig);
+                        // Get the VMPr algorithm task
+                        if(Parameter.VMPR_ALGORITHM.equals("MEMETIC")) {
+                            // Config the call for the memetic algorithm
+                            staticReconfgTask = new StaticReconfMemeCall(memeticPlacement, aPrioriValuesList,
+                                    memeConfig);
+                        }else {
+                            staticReconfgTask = new AcoCall(memeticPlacement, aPrioriValuesList, Utils.getAcoSettings());
+                        }
 
                         // Call the memetic algorithm in a separate thread
                         reconfgResult = executorService.submit(staticReconfgTask);

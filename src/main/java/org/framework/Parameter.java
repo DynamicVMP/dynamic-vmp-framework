@@ -14,6 +14,16 @@ public class Parameter {
     }
 
     // EXPERIMENTS PARAMETERS
+
+    /**
+     * Type of Algorithm
+     * 0 = Periodic Reconfiguration
+     * 1 = State of Art
+     * 2 = Beloglazob Approach
+     * 3 = Clever Reconfiguration
+     */
+    public static Integer ALGORITHM;
+
     /**
      * Heuristic Algorithm Code
      */
@@ -112,12 +122,35 @@ public class Parameter {
      */
     public static String SCALARIZATION_METHOD;
 
+
     /**
-     * Type of Algorithm
-     * 0 = State of Art
-     * 1 = Beloglazob Approach
-     * 2 = Periodic Reconfiguration
-     * 3 = Clever Reconfiguration
+     * Max pheromone allowed in ACO.
      */
-    public static Integer ALGORITHM;
+    public static Float MAX_PHEROMONE;
+
+    /**
+     * Pheromone constant for ACO, range [0,1],
+     * determines how fast pheromone evaporates.
+     * Pheromones evaporates quicker as pheromone
+     * constant grows.
+     */
+    public static Float PHEROMONE_CONSTANT;
+
+    /**
+     * Number of ants used for ACO.
+     */
+    public static Integer N_ANTS;
+
+    /**
+     * Number of iterations to be performed in ACO
+     * to return a solution.
+     */
+    public static Integer ACO_ITERATIONS;
+
+    /**
+     * VMPr algorithm:
+     * - MEMETIC
+     * - ACO
+     */
+    public static String VMPR_ALGORITHM;
 }
