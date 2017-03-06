@@ -6,6 +6,7 @@ org.framework.algorithm.stateOfArt
 org.framework.algorithm.thresholdBasedApproach
 org.framework.comparator
 org.framework.iterativeAlgorithm
+org.framework.reconfigurationAlgorithm.acoAlgorithm
 org.framework.reconfigurationAlgorithm.concurrent
 org.framework.reconfigurationAlgorithm.configuration
 org.framework.reconfigurationAlgorithm.enums
