@@ -36,18 +36,23 @@ $ java -jar target/DynamicVMPFramework.jar parameter
  * FULL
  * SATURATED
 4. DERIVE_COST = Cost per each derived VM
-5. PROTECTION_FACTOR = Protection Factor
-6. INTERVAL_EXECUTION_MEMETIC = Periodic Time of MA Execution
-7. POPULATION_SIZE = Population size for MA
-8. NUMBER_GENERATIONS = Generations size for MA
-9. EXECUTION_DURATION = Time of Duration
-10. LINK_CAPACITY = Link Capacity for Migration
-11. MIGRATION_FACTOR_LOAD = Factor Load per Migration
-12. HISTORICAL_DATA_SIZE = Historical Data Sieze
-13. FORECAST_SIZE = Forecast Size
-14. SCALARIZATION_METHOD = Scalarization Method
+5. PROTECTION_FACTOR_01 = Resource1 protection factor [0;1]
+6. PROTECTION_FACTOR_02 = Resource2 protection factor [0;1]
+7. PROTECTION_FACTOR_03 = Resource3 protection factor [0;1]
+8. PENALTY_FACTOR_01 = Resource1 penalty factor (greater than 1)
+9. PENALTY_FACTOR_02 = Resource1 penalty factor (greater than 1)
+10. PENALTY_FACTOR_03 = Resource1 penalty factor (greater than 1)
+11. INTERVAL_EXECUTION_MEMETIC = Periodic Time of MA Execution
+12. POPULATION_SIZE = Population size for MA
+13. NUMBER_GENERATIONS = Generations size for MA
+14. EXECUTION_DURATION = Time of Duration
+15. LINK_CAPACITY = Link Capacity for Migration
+16. MIGRATION_FACTOR_LOAD = Factor Load per Migration
+17. HISTORICAL_DATA_SIZE = Historical Data Sieze
+18. FORECAST_SIZE = Forecast Size
+19. SCALARIZATION_METHOD = Scalarization Method
  * ED -> Euclidean Distance
  * MD -> Manhattan Distance
  * CD -> Chevyshev Distance
  * WS -> Weighted Sum
-15. SCENARIOS = List of Request
+20. SCENARIOS = List of Request

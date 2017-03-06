@@ -237,7 +237,25 @@ public class DynamicVMP {
      *      DERIVE_COST = Cost per each derived VM
      *  </li>
      *  <li>
-     *      PROTECTION_FACTOR = Protection Factor
+     *      FAULT_TOLERANCE = Fault tolerance
+     *  </li>
+     *  <li>
+     *      PROTECTION_FACTOR_1 = Resource1 protection factor [0;1]
+     *  </li>
+     *  <li>
+     *      PROTECTION_FACTOR_2 = Resource2 protection factor [0;1]
+     *  </li>
+     *  <li>
+     *      PROTECTION_FACTOR_3 = Resource3 protection factor [0;1]
+     *  </li>
+     *  <li>
+     *      PENALTY_FACTOR_01 = Resource1 penalty factor (greater than 1)
+     *  </li>
+     *  <li>
+     *      PENALTY_FACTOR_02 = Resource2 penalty factor (greater than 1)
+     *  </li>
+     *  <li>
+     *      PENALTY_FACTOR_03 = Resource3 penalty factor (greater than 1)
      *  </li>
      *  <li>
      *      INTERVAL_EXECUTION_MEMETIC = Periodic Time of MA Execution
