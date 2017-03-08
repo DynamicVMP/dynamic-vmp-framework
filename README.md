@@ -23,6 +23,10 @@ $ java -jar target/DynamicVMPFramework.jar parameter
 ## Parameter File Structure
 
 1. ALGORITHM = Algorithm Code
+ * 0 -> Periodic
+ * 1 -> State of art
+ * 2 -> Threshold
+ * 3 -> Clever
 2. HEURISTIC_CODE = Heuristic Code
  * FF -> First Fit
  * BF -> Best Fit
