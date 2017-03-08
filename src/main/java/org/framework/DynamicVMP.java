@@ -290,6 +290,33 @@ public class DynamicVMP {
      *          <li>- WS = Weighted Sum </li>
      *      </ul>
      *  </li>
+     *       *  <li>
+     *      MAX_PHEROMONE = Max pheromone allowed in ACO.
+     *  </li>
+     *
+     *  <li>
+     *      PHEROMONE_CONSTANT = Pheromone constant for ACO, range [0,1],
+     * determines how fast pheromone evaporates.
+     * Pheromones evaporates quicker as pheromone
+     * constant grows.
+     *  </li>
+     *
+     *  <li>
+     *      N_ANTS = Number of ants used for ACO.
+     *  </li>
+     *
+     *  <li>
+     *      ACO_ITERATIONS = Number of iterations to be performed in ACO
+     * to return a solution.
+     *  </li>
+     *
+     *  <li>
+     *      VMPR_ALGORITHM = VMPr algorithm
+     *      <ul>
+     *          <li> MEMETIC </li>
+     *          <li> ACO </li>
+     *      </ul>
+     *  </li>
      *  <li>
      *      SCENARIOS = List of Request
      *  </li>

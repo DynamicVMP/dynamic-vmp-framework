@@ -59,4 +59,14 @@ $ java -jar target/DynamicVMPFramework.jar parameter
  * MD -> Manhattan Distance
  * CD -> Chevyshev Distance
  * WS -> Weighted Sum
-20. SCENARIOS = List of Request
+20. MAX_PHEROMONE = Max pheromone allowed in ACO
+21. PHEROMONE_CONSTANT = Pheromone constant for ACO, range [0,1],
+determines how fast pheromone evaporates. Pheromones evaporates
+quicker as pheromone constant grows.
+22. N_ANTS = Number of ants used for ACO
+23. ACO_ITERATIONS = Number of iterations to be performed in ACO
+to return a solution
+24. VMPR_ALGORITHM = VMPr algorithm
+ * MEMETIC
+ * ACO
+25. SCENARIOS = List of Request
