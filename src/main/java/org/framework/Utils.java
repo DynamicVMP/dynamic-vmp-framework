@@ -825,6 +825,56 @@ public class Utils {
 
 	}
 
+	public static Float getAvgPenaltyNormalized(Map<Integer, Float> penaltyByTime){
+	    List<Float> penaltyByTimeList = penaltyByTime.entrySet().stream().map(r->{
+	        Float value = r.getValue();
+            return value;
+	    }).collect(Collectors.toList());
+
+        Float min = penaltyByTimeList.get(0);
+        Float max = penaltyByTimeList.get(0);
+
+        for(Float currentPenalty: penaltyByTimeList){
+            if(currentPenalty>max){
+                max = currentPenalty;
+            }
+            if(currentPenalty<min){
+                min = currentPenalty;
+            }
+        }
+
+        Float normalizedPenalty;
+        for(int i=0; i<penaltyByTimeList.size(); i++){
+            normalizedPenalty = normalizeValue(penaltyByTimeList.get(i), min, max);
+            penaltyByTimeList.set(i, normalizedPenalty);
+        }
+
+        return average(penaltyByTimeList);
+    }
+
+
+    public static Float getAvgLeasingNormalized(List<Float> leasingCostsApriori) {
+        Float min = leasingCostsApriori.get(0);
+        Float max = leasingCostsApriori.get(0);
+
+        for(Float leasing: leasingCostsApriori){
+            if(leasing>max){
+                max = leasing;
+            }
+            if(leasing<min){
+                min = leasing;
+            }
+        }
+
+        Float normalizedLeasing;
+        for(int i=0; i<leasingCostsApriori.size(); i++){
+            normalizedLeasing = normalizeValue(leasingCostsApriori.get(i), min, max);
+            leasingCostsApriori.set(i, normalizedLeasing);
+        }
+
+        return average(leasingCostsApriori);
+    }
+
 	/**
 	 *
 	 * @param wastedResourcesByTime Map of Wasted Resources By Time

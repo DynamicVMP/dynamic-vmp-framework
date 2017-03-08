@@ -74,6 +74,8 @@ public class DynamicVMP {
      */
     static Map<Integer, Float> revenueAprioriTime = new HashMap<>();
     static Map<Integer, Float> migratedMemoryAprioriTime = new HashMap<>();
+    private static Map<Integer, Float> economicalPenaltiesAprioriTime = new HashMap<>();
+    private static List<Float> leasingCostsApriori = new ArrayList<>();
 
     /**
      *  Map {VM_ID, Violation} = Violation per VM, per Time, per Resources
@@ -433,8 +435,8 @@ public class DynamicVMP {
         Utils.printToFile(Constant.WASTED_RESOURCES_RATIO_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, wastedResources);
         Utils.printToFile(Constant.SCENARIOS_SCORES + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, scenarioScored);
         Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME,"\n");
-        Utils.printToFile(Constant.ECONOMICAL_PENALTIES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, DynamicVMP.economicalPenalties);
-        Utils.printToFile(Constant.LEASING_COSTS_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, DynamicVMP.leasingCosts);
+        Utils.printToFile(Constant.ECONOMICAL_PENALTIES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgPenaltyNormalized(DynamicVMP.economicalPenaltiesAprioriTime));
+        Utils.printToFile(Constant.LEASING_COSTS_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgLeasingNormalized(DynamicVMP.leasingCostsApriori));
     }
 
     /**
@@ -576,6 +578,12 @@ public class DynamicVMP {
         Float newAPrioriRevenue = currentRevenue + violationRevenue;
         DynamicVMP.revenueAprioriTime.put(timeViolation, newAPrioriRevenue);
 
+        if(economicalPenaltiesAprioriTime.get(timeViolation)==null){
+            economicalPenaltiesAprioriTime.put(timeViolation, violationRevenue);
+        }else{
+            Float old = economicalPenaltiesAprioriTime.get(timeViolation);
+            economicalPenaltiesAprioriTime.put(timeViolation, old+violationRevenue);
+        }
         economicalPenalties += violationRevenue;
     }
 
@@ -587,6 +595,8 @@ public class DynamicVMP {
             leasingCostRevenue += dvm.getResources().get(1) * dvm.getRevenue().getRam() * Parameter.DERIVE_COST;
             leasingCostRevenue += dvm.getResources().get(2) * dvm.getRevenue().getNet() * Parameter.DERIVE_COST;
         }
+
+        leasingCostsApriori.add(leasingCostRevenue);
 
         leasingCosts += leasingCostRevenue;
     }
