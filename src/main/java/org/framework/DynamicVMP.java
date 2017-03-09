@@ -436,7 +436,7 @@ public class DynamicVMP {
         Utils.printToFile(Constant.SCENARIOS_SCORES + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, scenarioScored);
         Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME,"\n");
         Utils.printToFile(Constant.ECONOMICAL_PENALTIES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgPenaltyNormalized(DynamicVMP.economicalPenaltiesAprioriTime));
-        Utils.printToFile(Constant.LEASING_COSTS_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgLeasingNormalized(DynamicVMP.leasingCostsApriori));
+        Utils.printToFile(Constant.LEASING_COSTS_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgNormalized(DynamicVMP.leasingCostsApriori));
     }
 
     /**

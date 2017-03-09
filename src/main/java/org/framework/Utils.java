@@ -831,48 +831,34 @@ public class Utils {
             return value;
 	    }).collect(Collectors.toList());
 
-        Float min = penaltyByTimeList.get(0);
-        Float max = penaltyByTimeList.get(0);
-
-        for(Float currentPenalty: penaltyByTimeList){
-            if(currentPenalty>max){
-                max = currentPenalty;
-            }
-            if(currentPenalty<min){
-                min = currentPenalty;
-            }
-        }
-
-        Float normalizedPenalty;
-        for(int i=0; i<penaltyByTimeList.size(); i++){
-            normalizedPenalty = normalizeValue(penaltyByTimeList.get(i), min, max);
-            penaltyByTimeList.set(i, normalizedPenalty);
-        }
-
-        return average(penaltyByTimeList);
+        return getAvgNormalized(penaltyByTimeList);
     }
 
 
-    public static Float getAvgLeasingNormalized(List<Float> leasingCostsApriori) {
-        Float min = leasingCostsApriori.get(0);
-        Float max = leasingCostsApriori.get(0);
+    public static Float getAvgNormalized(List<Float> list) {
+        if(list.size()==0){
+            return 0.0F;
+        }else {
+            Float min = list.get(0);
+            Float max = list.get(0);
 
-        for(Float leasing: leasingCostsApriori){
-            if(leasing>max){
-                max = leasing;
+            for (Float leasing : list) {
+                if (leasing > max) {
+                    max = leasing;
+                }
+                if (leasing < min) {
+                    min = leasing;
+                }
             }
-            if(leasing<min){
-                min = leasing;
+
+            Float normalizedValue;
+            for (int i = 0; i < list.size(); i++) {
+                normalizedValue = normalizeValue(list.get(i), min, max);
+                list.set(i, normalizedValue);
             }
-        }
 
-        Float normalizedLeasing;
-        for(int i=0; i<leasingCostsApriori.size(); i++){
-            normalizedLeasing = normalizeValue(leasingCostsApriori.get(i), min, max);
-            leasingCostsApriori.set(i, normalizedLeasing);
+            return average(list);
         }
-
-        return average(leasingCostsApriori);
     }
 
 	/**
