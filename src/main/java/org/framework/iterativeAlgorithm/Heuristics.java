@@ -194,7 +194,7 @@ public class Heuristics {
         Violation violation = new Violation(timeViolation, res);
 
         DynamicVMP.updateEconomicalPenalties(vm,res, timeViolation);
-        DynamicVMP.unsatisfiedResources.put(vm.getId(), violation);
+        DynamicVMP.unsatisfiedResources.put(vm.getCloudService()+"_"+vm.getId(), violation);
     }
 
     /**
