@@ -88,7 +88,7 @@ public class ObjectivesFunctions {
         for (VirtualMachine vm : virtualMachines) {
 
             // Get violation per VM per time (if exists)
-            violation = DynamicVMP.unsatisfiedResources.get(vm.getId());
+            violation = DynamicVMP.unsatisfiedResources.get(vm.getCloudService()+"_"+vm.getId());
             if (violation != null && timeUnit != null) {
                 resources = violation.getResourcesViolated().get(timeUnit);
                 // Get Violated Resources
