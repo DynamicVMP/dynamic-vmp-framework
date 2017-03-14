@@ -76,7 +76,7 @@ public class Aco {
         initialScore = Utils.calcPlacemenScore(objectiveFunctions, aPrioriValueList);
         globalScore = initialScore;
         // printing
-        System.out.println("\nfirst score: " + globalScore);
+//        System.out.println("\nfirst score: " + globalScore);
         while(acoIterations>0){
             acoIterations--;
             bestAntScore = initialScore;
@@ -152,7 +152,7 @@ public class Aco {
                 mapVMs = VirtualMachine.cloneVMsList(bestAntVMs);
 
                 // printing
-                System.out.println("globalScore: " + globalScore + "\t\tacoIterations: "+acoIterations);
+//                System.out.println("globalScore: " + globalScore + "\t\tacoIterations: "+acoIterations);
             }
 
             // update pheromone
@@ -182,12 +182,12 @@ public class Aco {
         newPlacement.setPlacementScore(globalScore);
 
 //        debug only
-        Boolean equalList = compareVMLists(actualPlacement.getVirtualMachineList(), newPlacement.getVirtualMachineList());
-        if(equalList) {
-            System.out.println("Returned score: " + globalScore+"\t\t equalList");
-        }else {
-            System.out.println("Returned score: "+ globalScore+"\t\t NOT equalList");
-        }
+//        Boolean equalList = compareVMLists(actualPlacement.getVirtualMachineList(), newPlacement.getVirtualMachineList());
+//        if(equalList) {
+//            System.out.println("Returned score: " + globalScore+"\t\t equalList");
+//        }else {
+//            System.out.println("Returned score: "+ globalScore+"\t\t NOT equalList");
+//        }
 
         return newPlacement;
     }
@@ -279,15 +279,27 @@ public class Aco {
                 pm.updateResource(0, vmResource0, "SUM");
                 pm.updateResource(1, vmResource1, "SUM");
                 pm.updateResource(2, vmResource2, "SUM");
-            }else{
-                System.out.println("ERROR freeSpace. Line 243.");
-                if(oldPM.getId()==null){
-                    System.out.println("oldPM = null.");
-                }
             }
-        }else {
-            System.out.println("same PM.");
+
+////            debug only
+//            else{
+//                System.out.println("ERROR freeSpace. Line 243.");
+//                System.out.println("freeSpace0: "+freeSpace0);
+//                System.out.println("freeSpace1: "+freeSpace1);
+//                System.out.println("freeSpace2: "+freeSpace2);
+//                System.out.println("normalizedProb: "+normalizedProb[randomVM][randomPM]);
+//                System.out.println("heuristic: "+heuristic[randomVM][randomPM]);
+//                System.out.println("pheromone: "+pheromone[randomVM][randomPM]);
+//                if(oldPM.getId()==null){
+//                    System.out.println("oldPM = null.");
+//                }
+//            }
         }
+
+//        debug only
+//        else {
+//            System.out.println("same PM. randomVM(index)= "+randomVM+" randomPM(index)= "+randomPM);
+//        }
     }
 
 
@@ -332,7 +344,7 @@ public class Aco {
         Boolean finish=false;
         for (int v = 0; v < nVMs; v++) {
             for (int p = 0; p < nPMs; p++) {
-                if (normalizedProb[v][p] > randomProb) {
+                if (normalizedProb[v][p] >= randomProb) {
                     randomVM = v;
                     randomPM = p;
                     finish = true;
@@ -344,9 +356,10 @@ public class Aco {
             }
         }
 
-        if(!finish){
-            System.out.println("FINISH false. Line 299.");
-        }
+//        debug only
+//        if(!finish){
+//            System.out.println("FINISH false. Line 299.");
+//        }
     }
 
 
@@ -432,15 +445,14 @@ public class Aco {
                         normalizedProb[v][p] += last;
                         last = normalizedProb[v][p];
                     }
-
-//                else {
-//                    System.out.println("prob cero");
-//                }
                 }
             }
-        }else {
-            System.out.println("ERROR sumP robabilities = 0, dividing.");
         }
+
+//        debug only
+//        else {
+//            System.out.println("ERROR sumP robabilities = 0, dividing.");
+//        }
 
     }
 
