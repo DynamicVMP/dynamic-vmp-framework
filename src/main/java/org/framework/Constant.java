@@ -22,6 +22,7 @@ public class Constant {
     public static final String RECONFIGURATION_CALL_TIMES_FILE = Utils.OUTPUT + "reconfiguration_call_times";
     public static final String ECONOMICAL_PENALTIES_FILE = Utils.OUTPUT + "economical_penalties";
     public static final String LEASING_COSTS_FILE = Utils.OUTPUT + "leasing_costs";
+    public static final String PLACEMENT_SCORE_BY_TIME_FILE = Utils.OUTPUT + "placement_score_by_time/";
 
     /**
      * Heuristics Algorithms

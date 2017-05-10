@@ -14,7 +14,10 @@ import org.framework.comparator.MemoryComparator;
 import org.framework.reconfigurationAlgorithm.enums.ResourcesEnum;
 import org.framework.reconfigurationAlgorithm.memeticAlgorithm.MASettings;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
@@ -34,10 +37,9 @@ import static java.nio.file.Files.*;
  */
 public class Utils {
 
-    public static final String OUTPUT = "outputs/";
-    public static final String PLACEMENT_SCORE_BY_TIME = "placement_score_by_time/";
+    public static String OUTPUT = "outputs/";
 
-    public static final String INPUT = "inputs/";
+    public static String INPUT = "inputs/";
 
     public static final String SUM = "SUM";
     public static final String SUB = "SUB";
@@ -836,6 +838,33 @@ public class Utils {
 
         return newEndTimeMigration;
     }
+
+	/**
+	 * Create intermediate folders present in a path if they do not exist
+	 * @param pathFolders
+	 */
+	public static void checkPathFolders(String pathFolders){
+		Path path = Paths.get(pathFolders);
+
+		if(!Files.exists(path))
+		{
+			File dir = new File(pathFolders);
+			dir.mkdirs();
+		}
+	}
+
+
+	/**
+	 * Check if the folders of the output path exist and set the input-output paths for the experiments
+	 * @param parametersFilePath
+	 * @param outputFolderPath
+	 */
+	public static void preprocessInputOutputPaths(String parametersFilePath,String outputFolderPath){
+		Path inputParametersPath = Paths.get(parametersFilePath);
+		checkPathFolders(outputFolderPath);
+		Utils.INPUT = inputParametersPath.getParent().toString()+"/";
+		Utils.OUTPUT = outputFolderPath;
+	}
 
 
 

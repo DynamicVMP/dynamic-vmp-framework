@@ -292,6 +292,8 @@ public class DynamicVMP {
             logger.log(Level.INFO, "Some arguments are missing!");
         }
         String parameterFile = args[0];
+        String outputFolderPath = args[1];
+        Utils.preprocessInputOutputPaths(parameterFile,outputFolderPath);
         loadParameters(scenariosFiles, parameterFile);
 
         logger.log(Level.INFO, "EXECUTING EXPERIMENTS");
@@ -338,8 +340,8 @@ public class DynamicVMP {
 
         Integer[] requestsProcess = initRequestProcess();
         Float[] realRevenue = new Float[]{0F};
-
-        Files.write(Paths.get(Utils.OUTPUT + Utils.PLACEMENT_SCORE_BY_TIME + scenarioFile),
+        Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
+        Files.write(Paths.get(Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile),
                 (scenarioFile + "\n" ).getBytes(), StandardOpenOption.CREATE);
 
         // LIST
@@ -409,7 +411,7 @@ public class DynamicVMP {
                 wastedResources.add(new Resources());
                 wastedResourcesRatioByTime.put(timeAdjust, 0F);
                 revenueByTime.put(timeAdjust, 0F);
-                Utils.printToFile(Utils.OUTPUT + Utils.PLACEMENT_SCORE_BY_TIME + scenarioFile, 0);
+                Utils.printToFile(Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile, 0);
                 timeAdjust++;
                 timeSimulated += 1;
             }

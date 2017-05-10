@@ -124,8 +124,9 @@ public class PeriodicMigration {
                 Float placementScore = ObjectivesFunctions.getDistanceOrigenByTime(request.getTime(),
                         maxPower, powerByTime, revenueByTime, wastedResourcesRatioByTime);
 
+                Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
                 // Print the Placement Score by Time t
-                Utils.printToFile( Utils.OUTPUT + Utils.PLACEMENT_SCORE_BY_TIME + scenarioFile, placementScore);
+                Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile, placementScore);
 
                 timeUnit = actualTimeUnit;
 
