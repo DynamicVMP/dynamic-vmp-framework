@@ -11,6 +11,7 @@ package org.framework;
 
 import org.domain.*;
 import org.framework.algorithm.cleverReconfiguration.CleverReconfiguration;
+import org.framework.algorithm.onlineApproach.OnlineApproach;
 import org.framework.algorithm.periodicMigration.PeriodicMigration;
 import org.framework.algorithm.stateOfArt.StateOfArt;
 import org.framework.algorithm.thresholdBasedApproach.ThresholdBasedApproach;
@@ -51,6 +52,7 @@ public class DynamicVMP {
                 StateOfArt::stateOfArtManager,                          // Alg1
                 ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg2
                 CleverReconfiguration::cleverReconfigurationgManager,   // Alg3
+                OnlineApproach::onlineApproachManager,                  //Alg4
         };
     }
 
