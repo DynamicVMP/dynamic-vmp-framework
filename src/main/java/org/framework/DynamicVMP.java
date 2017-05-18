@@ -214,15 +214,41 @@ public class DynamicVMP {
      * <b>Parameter file structure:</b>
      * <ul>
      *  <li>
-     *      ALGORITHM = Algorithm Code
-     *  </li>
-     *      <li>HEURISTIC_CODE = Heuristic Code
+     *      APPROACH = Algorithm approach
      *      <ul>
-     *          <li> FF = First Fit</li>
-     *          <li> BF = Best Fit </li>
-     *          <li> WF = Worst Fit </li>
-     *          <li> FFD = First Fit Decreasing</li>
-     *          <li> BFD = Best Fit Decreasing</li>
+     *          <li> CENTRALIZED </li>
+     *          <li> DISTRIBUTED </li>
+     *      </ul>
+     *  </li>
+     *  <li>
+     *      iVMP = iVMP algorithm
+     *      <ul>
+     *          <li> FF -> First Fit </li>
+     *          <li> BF -> Best Fit </li>
+     *          <li> WF -> Worst Fit </li>
+     *          <li> FFD -> First Fit Decreasing </li>
+     *          <li> BFD -> Best Fit Decreasing </li>
+     *      </ul>
+     *  </li>
+     *  <li>
+     *      VMPr = VMPr algorithm
+     *      <ul>
+     *          <li> MEMETIC </li>
+     *          <li> ACO </li>
+     *      </ul>
+     *  </li>
+     *  <li>
+     *      VMPr_TRIGGERING = VMPr triggering
+     *      <ul>
+     *          <li> PERIODICALLY </li>
+     *          <li> PREDICTION-BASED </li>
+     *      </ul>
+     *  </li>
+     *  <li>
+     *      VMPr_RECOVERING = VMPr recovering
+     *      <ul>
+     *          <li> CANCELLATION </li>
+     *          <li> UPDATE-BASED </li>
      *      </ul>
      *  </li>
      *  <li>
@@ -312,13 +338,6 @@ public class DynamicVMP {
      * to return a solution.
      *  </li>
      *
-     *  <li>
-     *      VMPR_ALGORITHM = VMPr algorithm
-     *      <ul>
-     *          <li> MEMETIC </li>
-     *          <li> ACO </li>
-     *      </ul>
-     *  </li>
      *  <li>
      *      SCENARIOS = List of Request
      *  </li>

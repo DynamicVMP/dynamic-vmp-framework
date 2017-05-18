@@ -35,6 +35,9 @@ import static java.nio.file.Files.*;
  * @since 8/15/16.
  */
 public class Utils {
+    // recovering methods constants
+    public static final String CANCELLATION = "CANCELLATION";
+    public static final String UPDATE_BASED = "UPDATE-BASED";
 
     public static final String OUTPUT = "outputs/";
     public static final String PLACEMENT_SCORE_BY_TIME = "placement_score_by_time/";
@@ -638,8 +641,32 @@ public class Utils {
         int protectionFactorCount = (int) parameter.stream().filter(line -> line.contains("PROTECTION_FACTOR")).count();
         int penaltyFactorCount = (int) parameter.stream().filter(line -> line.contains("PENALTY_FACTOR")).count();
 
-        Parameter.ALGORITHM = Integer.parseInt( (String) parameterMap.get("ALGORITHM"));
-        Parameter.HEURISTIC_CODE = (String) parameterMap.get("HEURISTIC_CODE");
+        if(parameterMap.get("APPROACH")!=null){
+            Parameter.APPROACH = (String) parameterMap.get("VMPr");
+
+            if(Parameter.APPROACH.equals("DISTRIBUTED")){
+                Parameter.ALGORITHM = 2;
+            }
+        }
+
+        if(parameterMap.get("VMPr")!=null) {
+            Parameter.VMPR_ALGORITHM = (String) parameterMap.get("VMPr");
+        }
+
+        if(parameterMap.get("VMPr_RECOVERING")!=null) {
+            Parameter.RECOVERING_METHOD = (String) parameterMap.get("VMPr_RECOVERING");
+        }
+
+        if(parameterMap.get("VMPr_TRIGGERING")!=null) {
+            String triggering = (String) parameterMap.get("VMPr_TRIGGERING");
+
+            if(triggering.equals("PERIODICALLY")){
+                Parameter.ALGORITHM = 1;
+            }else if(triggering.equals("PREDICTION-BASED")){
+                Parameter.ALGORITHM = 3;
+            }
+        }
+        Parameter.HEURISTIC_CODE = (String) parameterMap.get("iVMP");
         Parameter.PM_CONFIG = (String) parameterMap.get("PM_CONFIG");
         Parameter.DERIVE_COST = new Float ((String) parameterMap.get("DERIVE_COST"));
         Parameter.FAULT_TOLERANCE = Boolean.getBoolean( (String) parameterMap.get("FAULT_TOLERANCE"));
@@ -656,19 +683,39 @@ public class Utils {
 
         Parameter.INTERVAL_EXECUTION_MEMETIC = Integer.parseInt( (String) parameterMap.get
                 ("INTERVAL_EXECUTION_MEMETIC"));
-        Parameter.POPULATION_SIZE = Integer.parseInt( (String) parameterMap.get("POPULATION_SIZE"));
-        Parameter.NUMBER_GENERATIONS = Integer.parseInt( (String) parameterMap.get("NUMBER_GENERATIONS"));
+
+        if(parameterMap.get("POPULATION_SIZE")!=null) {
+            Parameter.POPULATION_SIZE = Integer.parseInt((String) parameterMap.get("POPULATION_SIZE"));
+        }
+
+        if(parameterMap.get("NUMBER_GENERATIONS")!=null) {
+            Parameter.NUMBER_GENERATIONS = Integer.parseInt((String) parameterMap.get("NUMBER_GENERATIONS"));
+        }
+
         Parameter.EXECUTION_DURATION = Integer.parseInt( (String) parameterMap.get("EXECUTION_DURATION"));
         Parameter.LINK_CAPACITY =  new Float ((String) parameterMap.get("LINK_CAPACITY"));
         Parameter.MIGRATION_FACTOR_LOAD =  new Float ((String) parameterMap.get("MIGRATION_FACTOR_LOAD"));
         Parameter.HISTORICAL_DATA_SIZE = Integer.parseInt( (String) parameterMap.get("HISTORICAL_DATA_SIZE"));
         Parameter.FORECAST_SIZE =Integer.parseInt( (String)  parameterMap.get("FORECAST_SIZE"));
         Parameter.SCALARIZATION_METHOD = (String) parameterMap.get("SCALARIZATION_METHOD");
-        Parameter.MAX_PHEROMONE = new Float((String) parameterMap.get("MAX_PHEROMONE"));
-        Parameter.PHEROMONE_CONSTANT = new Float((String) parameterMap.get("PHEROMONE_CONSTANT"));
-        Parameter.N_ANTS = Integer.parseInt((String) parameterMap.get("N_ANTS"));
-        Parameter.ACO_ITERATIONS = Integer.parseInt((String) parameterMap.get("ACO_ITERATIONS"));
-        Parameter.VMPR_ALGORITHM = (String) parameterMap.get("VMPR_ALGORITHM");
+
+        if(parameterMap.get("MAX_PHEROMONE")!=null) {
+            Parameter.MAX_PHEROMONE = new Float((String) parameterMap.get("MAX_PHEROMONE"));
+        }
+
+        if(parameterMap.get("PHEROMONE_CONSTANT")!=null) {
+            Parameter.PHEROMONE_CONSTANT = new Float((String) parameterMap.get("PHEROMONE_CONSTANT"));
+        }
+
+        if(parameterMap.get("N_ANTS")!=null) {
+            Parameter.N_ANTS = Integer.parseInt((String) parameterMap.get("N_ANTS"));
+        }
+
+        if(parameterMap.get("ACO_ITERATIONS")!=null) {
+            Parameter.ACO_ITERATIONS = Integer.parseInt((String) parameterMap.get("ACO_ITERATIONS"));
+        }
+
+
 
         prepareFilesSuffix();
 

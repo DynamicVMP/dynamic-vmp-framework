@@ -2,6 +2,7 @@ package org.framework.algorithm.cleverReconfiguration;
 
 import org.domain.*;
 import org.framework.*;
+import org.framework.algorithm.stateOfArt.StateOfArtUtils;
 import org.framework.reconfigurationAlgorithm.acoAlgorithm.AcoCall;
 import org.framework.reconfigurationAlgorithm.concurrent.StaticReconfMemeCall;
 import org.framework.reconfigurationAlgorithm.memeticAlgorithm.MASettings;
@@ -166,39 +167,47 @@ public class CleverReconfiguration {
                 // Take a snapshot of the current placement to launch reconfiguration
                 if(nextTimeUnit!=-1 && nextTimeUnit.equals(memeticTimeInit)){
 
-                    memeticTimeInit = nextTimeUnit;
-                    if(!virtualMachines.isEmpty()) {
+                    // If a new VM request cames while memetic execution, memetic algorithm is cancel.
+                    if (Parameter.RECOVERING_METHOD.equals(Utils.CANCELLATION) &&
+                            StateOfArtUtils.newVmDuringMemeticExecution(workload, memeticTimeInit, memeticTimeInit +
+                                    memeConfig.getExecutionDuration())) {
+                        memeticTimeInit = memeticTimeInit + memeConfig.getExecutionInterval();
+                    }else {
 
-                        // Get the list of a priori values
-                        aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
+                        memeticTimeInit = nextTimeUnit;
+                        if (!virtualMachines.isEmpty()) {
 
-                        // Clone the current placement
-                        Placement memeticPlacement = new Placement(PhysicalMachine.clonePMsList(physicalMachines),
-                                VirtualMachine.cloneVMsList(virtualMachines),
-                                VirtualMachine.cloneVMsList(derivedVMs));
+                            // Get the list of a priori values
+                            aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
+
+                            // Clone the current placement
+                            Placement memeticPlacement = new Placement(PhysicalMachine.clonePMsList(physicalMachines),
+                                    VirtualMachine.cloneVMsList(virtualMachines),
+                                    VirtualMachine.cloneVMsList(derivedVMs));
 
 
-                        // Get the VMPr algorithm task
-                        if(Parameter.VMPR_ALGORITHM.equals("MEMETIC")) {
-                            // Config the call for the memetic algorithm
-                            staticReconfgTask = new StaticReconfMemeCall(memeticPlacement, aPrioriValuesList,
-                                    memeConfig);
-                        }else {
-                            staticReconfgTask = new AcoCall(memeticPlacement, aPrioriValuesList, Utils.getAcoSettings());
+                            // Get the VMPr algorithm task
+                            if (Parameter.VMPR_ALGORITHM.equals("MEMETIC")) {
+                                // Config the call for the memetic algorithm
+                                staticReconfgTask = new StaticReconfMemeCall(memeticPlacement, aPrioriValuesList,
+                                        memeConfig);
+                            } else {
+                                staticReconfgTask = new AcoCall(memeticPlacement, aPrioriValuesList, Utils.getAcoSettings());
+                            }
+
+                            // Call the memetic algorithm in a separate thread
+                            reconfgResult = executorService.submit(staticReconfgTask);
+
+                            // Update the time end of the memetic algorithm execution
+
+                            memeticTimeEnd = memeticTimeInit + memeConfig.getExecutionDuration();
+
+                            // Update the migration init time
+                            migrationTimeInit = memeticTimeEnd + 1;
+
+                        } else {
+                            migrationTimeInit += 1;
                         }
-
-                        // Call the memetic algorithm in a separate thread
-                        reconfgResult = executorService.submit(staticReconfgTask);
-
-                        // Update the time end of the memetic algorithm execution
-
-                        memeticTimeEnd = memeticTimeInit + memeConfig.getExecutionDuration();
-
-                        // Update the migration init time
-                        migrationTimeInit = memeticTimeEnd+1;
-
-                    }else{
-                        migrationTimeInit += 1;
                     }
 
 

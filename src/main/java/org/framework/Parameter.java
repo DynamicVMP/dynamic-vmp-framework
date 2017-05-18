@@ -153,4 +153,18 @@ public class Parameter {
      * - ACO
      */
     public static String VMPR_ALGORITHM;
+
+    /**
+     * Recovering method:
+     * - CANCELLATION
+     * - UPDATE-BASED
+     */
+    public static String RECOVERING_METHOD;
+
+    /**
+     * Approach:
+     * - CENTRALIZED
+     * - DISTRIBUTED
+     */
+    public static String APPROACH;
 }

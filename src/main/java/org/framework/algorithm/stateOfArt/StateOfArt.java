@@ -136,9 +136,9 @@ public class StateOfArt {
                 if(nextTimeUnit!=-1 && nextTimeUnit.equals(memeticTimeInit)){
 
                     // If a new VM request cames while memetic execution, memetic algorithm is cancel.
-                    if (StateOfArtUtils.newVmDuringMemeticExecution(workload, memeticTimeInit, memeticTimeInit +
-                            memeConfig
-                            .getExecutionDuration())) {
+                    if (Parameter.RECOVERING_METHOD.equals(Utils.CANCELLATION) &&
+                            StateOfArtUtils.newVmDuringMemeticExecution(workload, memeticTimeInit, memeticTimeInit +
+                            memeConfig.getExecutionDuration())) {
                         memeticTimeInit = memeticTimeInit + memeConfig.getExecutionInterval();
                     } else {
 
