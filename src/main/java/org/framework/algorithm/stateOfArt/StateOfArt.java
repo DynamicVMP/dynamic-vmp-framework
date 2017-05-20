@@ -101,9 +101,10 @@ public class StateOfArt {
             nextTimeUnit = iterator + 1 == workload.size() ? -1 : workload.get(iterator + 1).getTime();
 
             if (nextTimeUnit!= -1 && isMigrationActive && DynamicVMP.isVmBeingMigrated(request.getVirtualMachineID(),
-                    vmsToMigrate)){
+                    request.getCloudServiceID(), vmsToMigrate)){
 
-                VirtualMachine vmMigrating = getById(request.getVirtualMachineID(),virtualMachines);
+                VirtualMachine vmMigrating = getById(request.getVirtualMachineID(),request.getCloudServiceID(),
+                    virtualMachines);
 
                 vmEndTimeMigration = Utils.updateVmEndTimeMigration(vmsToMigrate, vmsMigrationEndTimes,
                         vmEndTimeMigration,

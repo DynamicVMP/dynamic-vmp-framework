@@ -1,5 +1,6 @@
 package org.domain;
 
+import com.sun.istack.internal.NotNull;
 import org.framework.Utils;
 
 import java.util.ArrayList;
@@ -143,19 +144,21 @@ public class PhysicalMachine {
      * @param deltaResource New Resource
      * @param operation     Operation
      */
-    public void updateResource (Integer resource, Float deltaResource,
+    private void updateResource (Integer resource, Float deltaResource,
             String operation ) {
 
         if("SUM".equals(operation)) {
             Float newResource = deltaResource + this.getResourcesRequested().get(resource);
             this.getResourcesRequested().remove(resource.intValue());
             this.getResourcesRequested().add(resource, newResource);
+            return;
         }
 
         if("SUB".equals(operation)) {
             Float newResource = this.getResourcesRequested().get(resource) - deltaResource;
             this.getResourcesRequested().remove(resource.intValue());
             this.getResourcesRequested().add(resource, newResource);
+            return;
         }
 
         if("MAX".equals(operation)) {
@@ -198,7 +201,7 @@ public class PhysicalMachine {
     /**
      * Update Physical Machine Utilization
      */
-    public void updateUtilization() {
+    private void updateUtilization() {
 
         for (int k =0; k < this.getResources().size(); k++) {
             Float newUtilization = this.getResourcesRequested().get(k) / this.getResources().get(k);
@@ -259,8 +262,7 @@ public class PhysicalMachine {
     public void updatePMResources(VirtualMachine vm, String operation) {
 
         for (int k = 0; k < this.getResources().size(); k++) {
-            this.updateResource(k, vm.getResources().get(k) * vm.getUtilization().get(k) / 100,
-                    operation);
+            this.updateResource(k, vm.getResources().get(k) * vm.getUtilization().get(k) /100, operation);
         }
         this.updateUtilization();
     }

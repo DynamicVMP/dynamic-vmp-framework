@@ -223,7 +223,7 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
      * Create a copy of a Virtual Machine
      * @return Cloned VM
      */
-    private VirtualMachine cloneVM() {
+    public VirtualMachine cloneVM() {
 
         return new VirtualMachine(this.getId(), this.getResources(), this.getRevenue(), this.getTinit(),
                 this.getTend(), this.getUtilization(),this.getDatacenter(), this.getCloudService(),
@@ -249,13 +249,14 @@ public class VirtualMachine implements Comparable<VirtualMachine> {
     /**
      * Get VM by Id
      * @param vmId            Virtual Machine Id
+     * @param cloudServiceId  Cloud Service Id
      * @param virtualMachines List of VMs
      * @return Virtual Machine
      */
-    public static VirtualMachine getById(Integer vmId, List<VirtualMachine> virtualMachines) {
+    public static VirtualMachine getById(Integer vmId, Integer cloudServiceId, List<VirtualMachine> virtualMachines) {
 
         for (VirtualMachine vm : virtualMachines) {
-            if (vm.getId().equals(vmId)) {
+            if (vm.getId().equals(vmId) && vm.getCloudService().equals(cloudServiceId)) {
                 return vm;
             }
         }

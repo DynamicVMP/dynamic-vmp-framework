@@ -48,11 +48,11 @@ public class DynamicVMP {
     private static final Algorithm[] algorithms;
     static {
         algorithms = new Algorithm[]{
-                PeriodicMigration::periodicMigrationManager,            // Alg0
-                StateOfArt::stateOfArtManager,                          // Alg1
-                ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg2
-                CleverReconfiguration::cleverReconfigurationgManager,   // Alg3
-                OnlineApproach::onlineApproachManager,                  //Alg4
+                PeriodicMigration::periodicMigrationManager,            // Alg0 - Periodico con Update
+                StateOfArt::stateOfArtManager,                          // Alg1 - Periodico con Cancelacion
+                ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg2 - Beloglazob
+                CleverReconfiguration::cleverReconfigurationgManager,   // Alg3 -
+                OnlineApproach::onlineApproachManager,                  // Alg4 - iVMP Only
         };
     }
 
@@ -130,7 +130,7 @@ public class DynamicVMP {
         // If current_time is equals to VM tinit, allocated VM
         if (s.getTime() <= s.getTinit()) {
             if (Heuristics.getHeuristics()[code]
-                    .useHeuristic(vm, physicalMachines, virtualMachines, derivedVMs)) {
+                    .useHeuristic(vm, physicalMachines, virtualMachines, derivedVMs, false)) {
                 requests[0]++;
             } else {
                 // Derive Virtual Machine
@@ -152,6 +152,7 @@ public class DynamicVMP {
     }
 
     /**
+     * VMs Migration
      * @param code             Heuristic Code
      * @param physicalMachines List of Physical Machines
      * @param virtualMachines  List of allocated Virtual Machines
@@ -167,13 +168,13 @@ public class DynamicVMP {
 
         for (VirtualMachine vm : vmToMigrate) {
             hostPm = PhysicalMachine.getById(vm.getPhysicalMachine(), physicalMachines);
-
+            VirtualMachine migratedVM = vm.cloneVM();
             for (PhysicalMachine pm : physicalMachines) {
 
                 if(hostPm != null && !pm.getId().equals(hostPm.getId())
                     && Constraints.checkResources(pm, null, vm, virtualMachines, true)
                     && Heuristics.getHeuristics()[code]
-                        .useHeuristic(vm, physicalMachines, virtualMachines, derivedVMs)) {
+                        .useHeuristic(migratedVM, physicalMachines, virtualMachines, derivedVMs, true)) {
 
                     virtualMachines.remove(vm);
                     hostPm.updatePMResources(vm, Utils.SUB);
@@ -334,6 +335,7 @@ public class DynamicVMP {
      */
     private static void launchExperiments(String heuristicCode, String pmConfig, String scenarioFile)
             throws IOException, InterruptedException, ExecutionException {
+
         // VARIABLES
         List<PhysicalMachine> physicalMachines = new ArrayList<>();
         List<Scenario> scenarios = new ArrayList<>();
@@ -512,12 +514,13 @@ public class DynamicVMP {
         return requestsProcess;
     }
 
-    public static Boolean isVmBeingMigrated(Integer virtualMachineId, List<VirtualMachine> vmsToMigrate) {
+    public static Boolean isVmBeingMigrated(Integer virtualMachineId, Integer cloudServiceId, List<VirtualMachine>
+        vmsToMigrate) {
 		Integer iteratorVM;
 	    VirtualMachine vmMigrated;
 	    for(iteratorVM=0;iteratorVM<vmsToMigrate.size();iteratorVM++){
 			vmMigrated = vmsToMigrate.get(iteratorVM);
-			if(vmMigrated.getId().equals(virtualMachineId)) {
+			if(vmMigrated.getId().equals(virtualMachineId) && vmMigrated.getCloudService().equals(cloudServiceId) ) {
 				return true;
 			}
 		}

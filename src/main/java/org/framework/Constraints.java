@@ -43,23 +43,23 @@ public class Constraints {
             oldVm = deprecatedVM;
         }
 
-        Boolean checkCPU = pm.getResourcesRequested().get(0)
-                - (oldVm.getResources().get(0) * oldVm.getUtilization().get(0)/100 )
-                + (vm.getResources().get(0) * vm.getUtilization().get(0)/100)
-                + (vm.getResources().get(0) * (1- vm.getUtilization().get(0)/100)*Parameter.PROTECTION_FACTOR)
-                < pm.getResources().get(0);
+        Float toReserveCPU = pm.getResourcesRequested().get(0)
+            - (oldVm.getResources().get(0) * oldVm.getUtilization().get(0)/100 )
+            + (vm.getResources().get(0) * vm.getUtilization().get(0)/100)
+            + (vm.getResources().get(0) * (1- vm.getUtilization().get(0)/100)*Parameter.PROTECTION_FACTOR);
+        Boolean checkCPU = toReserveCPU < pm.getResources().get(0);
 
-        Boolean checkRAM = pm.getResourcesRequested().get(1)
-                - (oldVm.getResources().get(1) * oldVm.getUtilization().get(1)/100 )
-                + (vm.getResources().get(1) * vm.getUtilization().get(1)/100)
-                + (vm.getResources().get(1) * (1- vm.getUtilization().get(1)/100)*Parameter.PROTECTION_FACTOR)
-                < pm.getResources().get(1);
+        Float toReserveRAM = pm.getResourcesRequested().get(1)
+            - (oldVm.getResources().get(1) * oldVm.getUtilization().get(1) / 100)
+            + (vm.getResources().get(1) * vm.getUtilization().get(1) / 100)
+            + (vm.getResources().get(1) * (1 - vm.getUtilization().get(1) / 100) * Parameter.PROTECTION_FACTOR);
+        Boolean checkRAM = toReserveRAM < pm.getResources().get(1);
 
-        Boolean checkNET = pm.getResourcesRequested().get(2)
-                - (oldVm.getResources().get(2) * oldVm.getUtilization().get(2)/100 )
-                + (vm.getResources().get(2) * vm.getUtilization().get(2)/100)
-                + (vm.getResources().get(2) * (1- vm.getUtilization().get(2)/100)*Parameter.PROTECTION_FACTOR)
-                < pm.getResources().get(2);
+        Float toReserveNET = pm.getResourcesRequested().get(2)
+            - (oldVm.getResources().get(2) * oldVm.getUtilization().get(2) / 100)
+            + (vm.getResources().get(2) * vm.getUtilization().get(2) / 100)
+            + (vm.getResources().get(2) * (1 - vm.getUtilization().get(2) / 100) * Parameter.PROTECTION_FACTOR);
+        Boolean checkNET = toReserveNET < pm.getResources().get(2);
 
         Boolean flag = checkCPU && checkRAM && checkNET;
 
@@ -129,9 +129,9 @@ public class Constraints {
      */
     public static Boolean isPMOverloaded(PhysicalMachine pm){
 
-        return pm.getUtilization().get(0)> ExperimentConf.OVERLOAD_PM_THRESHOLD ||
-                pm.getUtilization().get(1)> ExperimentConf.OVERLOAD_PM_THRESHOLD ||
-                pm.getUtilization().get(2)> ExperimentConf.OVERLOAD_PM_THRESHOLD;
+        return pm.getUtilization().get(0) * 100 > ExperimentConf.OVERLOAD_PM_THRESHOLD ||
+               pm.getUtilization().get(1) * 100 > ExperimentConf.OVERLOAD_PM_THRESHOLD ||
+               pm.getUtilization().get(2) * 100 > ExperimentConf.OVERLOAD_PM_THRESHOLD;
     }
 
     /**
@@ -141,9 +141,9 @@ public class Constraints {
      */
     public static Boolean isPMUnderloaded(PhysicalMachine pm){
 
-        return pm.getUtilization().get(0)< ExperimentConf.UNDERLOAD_PM_THRESHOLD ||
-                pm.getUtilization().get(1)< ExperimentConf.UNDERLOAD_PM_THRESHOLD ||
-                pm.getUtilization().get(2)< ExperimentConf.UNDERLOAD_PM_THRESHOLD;
+        return pm.getUtilization().get(0) * 100 < ExperimentConf.UNDERLOAD_PM_THRESHOLD ||
+               pm.getUtilization().get(1) * 100 < ExperimentConf.UNDERLOAD_PM_THRESHOLD ||
+               pm.getUtilization().get(2) * 100 < ExperimentConf.UNDERLOAD_PM_THRESHOLD;
     }
 
 }

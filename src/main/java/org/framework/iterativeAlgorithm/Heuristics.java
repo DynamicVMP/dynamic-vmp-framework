@@ -39,8 +39,11 @@ public class Heuristics {
      */
     @FunctionalInterface
     public interface Algorithm {
-        Boolean useHeuristic(VirtualMachine vm, List<PhysicalMachine> physicalMachines,
-                List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs);
+        Boolean useHeuristic(VirtualMachine vm,
+            List<PhysicalMachine> physicalMachines,
+            List<VirtualMachine> virtualMachines,
+            List<VirtualMachine> derivedVMs,
+            Boolean isMigration);
     }
 
     /**
@@ -98,19 +101,17 @@ public class Heuristics {
                 s.getTinit(), s.getTend(), utilization, s.getDatacenterID(), s.getCloudServiceID(), null);
 
         // Search allocated VM
-        VirtualMachine vm = getById(updatedVM.getId(), virtualMachines);
+        VirtualMachine vm = getById(updatedVM.getId(), updatedVM.getCloudService(), virtualMachines);
 
         // Check if VM was allocated
         if(vm != null) {
             // Get PM host
             physicalMachine = PhysicalMachine.getById(vm.getPhysicalMachine(), physicalMachines);
             // Check resources
-            if (Constraints.checkResources(physicalMachine, vm, updatedVM, virtualMachines,true)) {
+            if (Constraints.checkResources(physicalMachine, vm, updatedVM, virtualMachines,
+                true)) {
                 // Update allocated VM
-                for (int k = 0; k < physicalMachine.getResources().size(); k++) {
-                    physicalMachine.updateResource(k, vm.getResources().get(k) * vm.getUtilization().get(k)/100,
-                            Utils.SUB);
-                }
+                physicalMachine.updatePMResources(vm, Utils.SUB);
                 updateVmResources(virtualMachines, updatedVM);
                 allocateVMToPM(updatedVM, physicalMachine);
                 return true;
@@ -138,13 +139,8 @@ public class Heuristics {
      * @param vm Virtual Machine
      * @param pm Physical Machine
      */
-    public static void allocateVMToPM(VirtualMachine vm, PhysicalMachine pm) {
-
-        pm.updateResource(0, vm.getResources().get(0) * vm.getUtilization().get(0) / 100, Utils.SUM);
-        pm.updateResource(1, vm.getResources().get(1) * vm.getUtilization().get(1) / 100, Utils.SUM);
-        pm.updateResource(2, vm.getResources().get(2) * vm.getUtilization().get(2) / 100, Utils.SUM);
-
-        pm.updateUtilization();
+    private static void allocateVMToPM(VirtualMachine vm, PhysicalMachine pm) {
+        pm.updatePMResources(vm, Utils.SUM);
     }
 
     /**
@@ -158,7 +154,7 @@ public class Heuristics {
      * @param vm            Virtual Machine (new version of Virtual Machine)
      * @param pm            Physical Machine
      */
-    public static void getViolation(Integer timeViolation, VirtualMachine oldVm, VirtualMachine vm,
+    private static void getViolation(Integer timeViolation, VirtualMachine oldVm, VirtualMachine vm,
             PhysicalMachine pm) {
 
         Float cpuViolation = 0F;
@@ -203,7 +199,7 @@ public class Heuristics {
      * @param virtualMachines Virtual Machines
      * @param updatedVM       Updated VM
      */
-    public static void updateVmResources(List<VirtualMachine> virtualMachines, VirtualMachine updatedVM) {
+    private static void updateVmResources(List<VirtualMachine> virtualMachines, VirtualMachine updatedVM) {
 
         virtualMachines.forEach(vm -> {
 
@@ -232,11 +228,7 @@ public class Heuristics {
                 Integer pmId = vm.getPhysicalMachine();
                 PhysicalMachine pm = PhysicalMachine.getById(pmId, physicalMachines);
                 if(pm != null ) {
-                    for (int i = 0; i < vm.getResources().size(); i++) {
-                        Float freeResource = vm.getResources().get(i) * vm.getUtilization().get(i)/100;
-                        pm.updateResource(i, freeResource, Utils.SUB);
-                    }
-                    pm.updateUtilization();
+                    pm.updatePMResources(vm, Utils.SUB);
                     toRemoveVM.add(vm);
                 }
             }
@@ -267,12 +259,13 @@ public class Heuristics {
      * @param physicalMachines   Physical Machines
      * @param virtualMachines    Virtual Machines
      * @param derivedVMs         Derived Virtual Machines
+     * @param isMigration      Indicates if the VM is being migrated
      * @return <b>True</b>, if VM was successfully allocated
      */
-    public static Boolean firstFit(VirtualMachine vm, List<PhysicalMachine> physicalMachines,
-            List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs) {
+    private static Boolean firstFit(VirtualMachine vm, List<PhysicalMachine> physicalMachines,
+            List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs, Boolean isMigration) {
 
-        if (allocateVMToDC(vm, physicalMachines, virtualMachines)) {
+        if (allocateVMToDC(vm, physicalMachines, virtualMachines, isMigration)) {
             return true;
         }
         // Set PM for derived VM to null
@@ -282,17 +275,21 @@ public class Heuristics {
 
     /**
      * Allocate VM To DC
-     * @param vm                VirtualMachine
+     * @param vm               VirtualMachine
      * @param physicalMachines List of PM
      * @param virtualMachines  List of VM
+     * @param isMigration      Indicates if the VM is being migrated
      * @return <b>True</b>, if DC can host the VM <br> <b>False</b>, otherwise
      */
     private static boolean allocateVMToDC(final VirtualMachine vm, final List<PhysicalMachine> physicalMachines,
-            final List<VirtualMachine> virtualMachines) {
+            final List<VirtualMachine> virtualMachines, Boolean isMigration) {
 
-        // If the VM is new, we set the utilization to 100%, we don't know this information a priori.
-        Resources uti = new Resources(100F, 100F, 100F);
-        vm.setUtilization(Arrays.asList(uti.getCpu(),uti.getRam(),uti.getNet()));
+        // If is migration we don't update the utilization
+        if(!isMigration) {
+            // If the VM is new, we set the utilization to 100%, we don't know this information a priori.
+            Resources uti = new Resources(100F, 100F, 100F);
+            vm.setUtilization(Arrays.asList(uti.getCpu(), uti.getRam(), uti.getNet()));
+        }
 
         for (PhysicalMachine pm : physicalMachines) {
             if (Constraints.checkResources(pm, null, vm, virtualMachines, false)) {
@@ -312,12 +309,13 @@ public class Heuristics {
      * @param physicalMachines   Physical Machines
      * @param virtualMachines    Virtual Machines
      * @param derivedVMs         Derived Virtual Machines
+     * @param isMigration      Indicates if the VM is being migrated
      * @return <b>True</b>, if VM was successfully allocated
      */
-    public static Boolean bestFit(VirtualMachine vm, List<PhysicalMachine> physicalMachines,
-            List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs) {
+    private static Boolean bestFit(VirtualMachine vm, List<PhysicalMachine> physicalMachines,
+            List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs, Boolean isMigration) {
 
-        return bestOrWorstFit(true, vm, physicalMachines, virtualMachines, derivedVMs);
+        return bestOrWorstFit(true, vm, physicalMachines, virtualMachines, derivedVMs, isMigration);
 
     }
 
@@ -328,10 +326,11 @@ public class Heuristics {
      * @param physicalMachines Physical Machines
      * @param virtualMachines  Virtual Machines
      * @param derivedVMs       Derived Virtual Machines
+     * @param isMigration      Indicates if the VM is being migrated
      * @return <b>True</b>, if VM was successfully allocated
      */
-    public static Boolean  bestOrWorstFit(Boolean isBest, VirtualMachine vm, List<PhysicalMachine> physicalMachines,
-            List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs) {
+    private static Boolean  bestOrWorstFit(Boolean isBest, VirtualMachine vm, List<PhysicalMachine> physicalMachines,
+            List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs, Boolean isMigration) {
 
         if (isBest) {
             Collections.sort(physicalMachines, new BestComparator());
@@ -339,7 +338,7 @@ public class Heuristics {
             Collections.sort(physicalMachines, new WorstComparator());
         }
 
-        if (allocateVMToDC(vm, physicalMachines, virtualMachines)) {
+        if (allocateVMToDC(vm, physicalMachines, virtualMachines, isMigration)) {
             return true;
         }
 
@@ -350,16 +349,17 @@ public class Heuristics {
 
     /**
      * Worst Fit
-     * @param vm                 VirtualMachine
-     * @param physicalMachines   Physical Machines
-     * @param virtualMachines    Virtual Machines
-     * @param derivedVMs         Derived Virtual Machines
+     * @param vm               VirtualMachine
+     * @param physicalMachines Physical Machines
+     * @param virtualMachines  Virtual Machines
+     * @param derivedVMs       Derived Virtual Machines
+     * @param isMigration      Indicates if the VM is being migrated
      * @return <b>True</b>, if VM was successfully allocated
      */
-    public static Boolean worstFit(VirtualMachine vm, List<PhysicalMachine> physicalMachines,
-            List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs) {
+    private static Boolean worstFit(VirtualMachine vm, List<PhysicalMachine> physicalMachines,
+            List<VirtualMachine> virtualMachines, List<VirtualMachine> derivedVMs, Boolean isMigration) {
 
-        return bestOrWorstFit(false, vm, physicalMachines, virtualMachines, derivedVMs);
+        return bestOrWorstFit(false, vm, physicalMachines, virtualMachines, derivedVMs, isMigration);
 
     }
 
