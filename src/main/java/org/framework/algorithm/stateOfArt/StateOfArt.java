@@ -86,7 +86,7 @@ public class StateOfArt {
         Integer actualTimeUnit;
         Integer nextTimeUnit;
 
-        Integer memeticTimeInit = timeUnit + memeConfig.getExecutionFirstTime();
+        Integer memeticTimeInit = timeUnit + memeConfig.getExecutionInterval();
         Integer memeticTimeEnd=-1;
 
         Integer migrationTimeInit =- 1;
@@ -196,7 +196,7 @@ public class StateOfArt {
                             //update the memetic algorithm init time
                             memeticTimeInit = memeticTimeEnd + memeConfig.getExecutionInterval();
                             //update the migration init
-                            memeticTimeInit  += memeConfig.getExecutionInterval();
+                            migrationTimeInit  = -1;
 
                         }
                     } catch (ExecutionException e) {

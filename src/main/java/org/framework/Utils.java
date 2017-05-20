@@ -399,7 +399,6 @@ public class Utils {
         settings.setExecutionDuration(Parameter.EXECUTION_DURATION);          // set the estimated duration of execution of the algorithm
         settings.setExecutionInterval(Parameter.INTERVAL_EXECUTION_MEMETIC);  // set the the interval of time to execute the algorithm
         settings.setFaultTolerance(Parameter.FAULT_TOLERANCE);                // set the flag to consider or not the fault tolerance constraint
-        settings.setExecutionFirstTime(3);
 
         if (isFullMeme){
             settings.setPopulationSize(Parameter.POPULATION_SIZE);

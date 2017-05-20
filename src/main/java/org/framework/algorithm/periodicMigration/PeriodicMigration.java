@@ -87,7 +87,7 @@ public class PeriodicMigration {
         Integer actualTimeUnit;
         Integer nextTimeUnit;
 
-        Integer memeticTimeInit = timeUnit + memeConfig.getExecutionFirstTime();
+        Integer memeticTimeInit = timeUnit + memeConfig.getExecutionInterval();
         Integer memeticTimeEnd=-1;
 
         Integer migrationTimeInit=-1;
