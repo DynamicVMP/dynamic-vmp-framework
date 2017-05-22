@@ -105,7 +105,9 @@ public class CleverReconfiguration {
             if (nextTimeUnit!= -1 && isMigrationActive && DynamicVMP.isVmBeingMigrated(request.getVirtualMachineID(),
                     request.getCloudServiceID(), vmsToMigrate)){
 
-                VirtualMachine vmMigrating = getById(request.getVirtualMachineID(), request.getCloudServiceID(), virtualMachines);
+                VirtualMachine vmMigrating = getById(request.getVirtualMachineID(), request.getCloudServiceID(),
+                    virtualMachines);
+
                 vmEndTimeMigration = Utils.updateVmEndTimeMigration(vmsToMigrate, vmsMigrationEndTimes,
                         vmEndTimeMigration,
                         vmMigrating);
@@ -113,7 +115,8 @@ public class CleverReconfiguration {
                 isUpdateVmUtilization = actualTimeUnit <= vmEndTimeMigration;
             }
 
-            DynamicVMP.runHeuristics(request, code, physicalMachines, virtualMachines, derivedVMs, requestsProcess, isUpdateVmUtilization);
+            DynamicVMP.runHeuristics(request, code, physicalMachines, virtualMachines, derivedVMs, requestsProcess,
+                isUpdateVmUtilization);
 
             // Check if its the last request or a variation of time unit will occurs.
             if (nextTimeUnit == -1 || !actualTimeUnit.equals(nextTimeUnit)) {
