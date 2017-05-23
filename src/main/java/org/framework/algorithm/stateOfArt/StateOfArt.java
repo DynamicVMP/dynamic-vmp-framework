@@ -79,19 +79,16 @@ public class StateOfArt {
         MASettings memeConfig = Utils.getMemeConfig(true);
         Callable<Placement> staticReconfgTask;
         Future<Placement> reconfgResult = null;
-        Placement reconfgPlacementResult = null;
+        Placement reconfgPlacementResult;
 
         Boolean isMigrationActive = false;
         Boolean isUpdateVmUtilization = false;
         Integer actualTimeUnit;
         Integer nextTimeUnit;
 
-        Integer memeticTimeInit = timeUnit + memeConfig.getExecutionInterval();
-        Integer memeticTimeEnd=-1;
-
-        Integer migrationTimeInit =- 1;
+        Integer reconfigurationTimeInit = timeUnit + memeConfig.getExecutionInterval();
+        Integer reconfigurationTimeEnd=-1;
         Integer migrationTimeEnd =- 1;
-
         Integer vmEndTimeMigration = 0;
 
         for (int iterator = 0; iterator < workload.size(); ++iterator) {
@@ -100,16 +97,20 @@ public class StateOfArt {
             //check if is the last request, assign -1 to nextTimeUnit if so.
             nextTimeUnit = iterator + 1 == workload.size() ? -1 : workload.get(iterator + 1).getTime();
 
+            //Check if overloading due to migrations is required
             if (nextTimeUnit!= -1 && isMigrationActive && DynamicVMP.isVmBeingMigrated(request.getVirtualMachineID(),
                     request.getCloudServiceID(), vmsToMigrate)){
 
+                //get the vm that is migrating
                 VirtualMachine vmMigrating = getById(request.getVirtualMachineID(),request.getCloudServiceID(),
                     virtualMachines);
 
+                //check the time when the migration of the vm ends
                 vmEndTimeMigration = Utils.updateVmEndTimeMigration(vmsToMigrate, vmsMigrationEndTimes,
                         vmEndTimeMigration,
                         vmMigrating);
 
+                //boolean condition to add or not overload to cpu utilization
                 isUpdateVmUtilization = actualTimeUnit <= vmEndTimeMigration;
             }
 
@@ -118,10 +119,12 @@ public class StateOfArt {
 
             // check if its the last request or a variation of time unit will occurs.
             if (nextTimeUnit == -1 || !actualTimeUnit.equals(nextTimeUnit)) {
+
+                //get the objective functions
                 ObjectivesFunctions.getObjectiveFunctionsByTime(physicalMachines,
                         virtualMachines, derivedVMs, wastedResources,
                         wastedResourcesRatioByTime, powerByTime, revenueByTime, timeUnit, actualTimeUnit);
-
+                // get the placement score based on the distance from origin method
                 Float placementScore = ObjectivesFunctions.getDistanceOrigenByTime(request.getTime(),
                         maxPower, powerByTime, revenueByTime, wastedResourcesRatioByTime);
 
@@ -131,19 +134,20 @@ public class StateOfArt {
 
                 timeUnit = actualTimeUnit;
 
+                //create the placement for the actual time unit
                 Placement heuristicPlacement = new Placement(PhysicalMachine.clonePMsList(physicalMachines),
                         VirtualMachine.cloneVMsList(virtualMachines),
                         VirtualMachine.cloneVMsList(derivedVMs), placementScore);
                 placements.put(actualTimeUnit, heuristicPlacement);
 
                 // Take a snapshot of the current placement to launch reconfiguration
-                if(nextTimeUnit!=-1 && nextTimeUnit.equals(memeticTimeInit)){
+                if(nextTimeUnit!=-1 && nextTimeUnit.equals(reconfigurationTimeInit)){
 
-                    // If a new VM request cames while memetic execution, memetic algorithm is cancel.
-                    if (StateOfArtUtils.newVmDuringMemeticExecution(workload, memeticTimeInit, memeticTimeInit +
+                    // If a new VM request cames while a reconfiguration is in progress, the reconfiguration is canceled.
+                    if (isMigrationActive || StateOfArtUtils.newVmDuringMemeticExecution(workload, reconfigurationTimeInit, reconfigurationTimeInit +
                             memeConfig
                             .getExecutionDuration())) {
-                        memeticTimeInit = memeticTimeInit + memeConfig.getExecutionInterval();
+                        reconfigurationTimeInit = reconfigurationTimeInit + memeConfig.getExecutionInterval();
                     } else {
 
                         if(!virtualMachines.isEmpty()) {
@@ -164,41 +168,59 @@ public class StateOfArt {
                             reconfgResult = executorService.submit(staticReconfgTask);
 
                             // Update the time end of the memetic algorithm execution
-                            memeticTimeEnd = memeticTimeInit + memeConfig.getExecutionDuration();
+                            reconfigurationTimeEnd = reconfigurationTimeInit + memeConfig.getExecutionDuration();
 
-                            // Update the migration init time
-                            migrationTimeInit = memeticTimeEnd + 1;
-
-                        } else {
-                            migrationTimeInit += 1;
                         }
                     }
-                }else if(nextTimeUnit != -1 && nextTimeUnit.equals(migrationTimeInit)) {
+                }else if(nextTimeUnit != -1 && actualTimeUnit.equals(reconfigurationTimeEnd)) {
 
-                    isMigrationActive = true;
                     try {
 
                         if(reconfgResult != null) {
                             //get the placement from the memetic algorithm execution
                             reconfgPlacementResult = reconfgResult.get();
-                            //get vms to migrate
-                            vmsToMigrate  = Utils.getVMsToMigrate(reconfgPlacementResult.getVirtualMachineList(),
-                                    placements.get(memeticTimeInit - 1).getVirtualMachineList());
-                            //update de virtual machine list of the placement for the migration operation
-                            Utils.removeDeadVMsFromPlacement(reconfgPlacementResult,actualTimeUnit,memeConfig.getNumberOfResources());
-                            //update de virtual machines migrated
-                            Utils.removeDeadVMsMigrated(vmsToMigrate,actualTimeUnit);
-                            //update the placement score after filtering dead  virtual machines.
-                            reconfgPlacementResult.updatePlacementScore(aPrioriValuesList);
-                            //get end time of vms migrations
-                            vmsMigrationEndTimes = Utils.getTimeEndMigrationByVM(vmsToMigrate, actualTimeUnit);
-                            //update migration end
-                            migrationTimeEnd = Utils.getMigrationEndTime(vmsMigrationEndTimes);
-                            //update the memetic algorithm init time
-                            memeticTimeInit = memeticTimeEnd + memeConfig.getExecutionInterval();
-                            //update the migration init
-                            migrationTimeInit  = -1;
 
+                            //update de virtual machine list of the placement
+                            Utils.removeDeadVMsFromPlacement(reconfgPlacementResult,actualTimeUnit,memeConfig.getNumberOfResources());
+
+                            /* Update de virtual machine list of the placement, update VMs
+                             * resources and add new VMs
+                             */
+                            Placement reconfgPlacementMerged = DynamicVMP.updatePlacementAfterReconf(workload, Constant.BFD,
+                                    reconfgPlacementResult,
+                                    reconfigurationTimeInit,
+                                    reconfigurationTimeEnd);
+
+                            aPrioriValuesList = Utils.getAprioriValuesList(actualTimeUnit);
+
+                            //update de virtual machine list of the placement
+                            Utils.removeDeadVMsFromPlacement(reconfgPlacementMerged,actualTimeUnit,memeConfig.getNumberOfResources());
+                            // Update the placement score after filtering dead  virtual machines.
+                            reconfgPlacementMerged.updatePlacementScore(aPrioriValuesList);
+
+                            //if the reconfiguration placement's score is better, accept it as the new placement
+                            if(DynamicVMP.isMememeticPlacementBetter(placements.get(actualTimeUnit), reconfgPlacementMerged)) {
+                                //get vms to migrate
+                                vmsToMigrate  = Utils.getVMsToMigrate(reconfgPlacementMerged.getVirtualMachineList(),
+                                        placements.get(reconfigurationTimeEnd).getVirtualMachineList());
+
+                                //update de virtual machines migrated
+                                Utils.removeDeadVMsMigrated(vmsToMigrate,actualTimeUnit);
+                                //get end time of vms migrations
+                                vmsMigrationEndTimes = Utils.getTimeEndMigrationByVM(vmsToMigrate, actualTimeUnit);
+                                //update migration end
+                                migrationTimeEnd = Utils.getMigrationEndTime(vmsMigrationEndTimes);
+                                isMigrationActive = true;
+
+                                physicalMachines = new ArrayList<>(reconfgPlacementMerged.getPhysicalMachines());
+                                virtualMachines = new ArrayList<>(reconfgPlacementMerged.getVirtualMachineList());
+                                derivedVMs = new ArrayList<>(reconfgPlacementMerged.getDerivedVMs());
+
+                                placements.put(actualTimeUnit, reconfgPlacementMerged);
+
+                            }
+                            //update the memetic algorithm init time
+                            reconfigurationTimeInit = reconfigurationTimeInit + memeConfig.getExecutionInterval();
                         }
                     } catch (ExecutionException e) {
                         logger.log(Level.SEVERE, "Migration Failed!");
@@ -206,30 +228,7 @@ public class StateOfArt {
                     }
 
                 } else if(nextTimeUnit != -1 && actualTimeUnit.equals(migrationTimeEnd)) {
-					/* Get here the new virtual machines to insert in the placement generated by the
-		             * memetic algorithm using Best Fit Decreasing
-		             */
-
-                    // Update de virtual machine list of the placement after the migration operation (remove VMs)
-                    Utils.removeDeadVMsFromPlacement(reconfgPlacementResult,actualTimeUnit,memeConfig.getNumberOfResources());
-
-                    /* Update de virtual machine list of the placement after the migration operation, update VMs
-                     * resources and add new VMs
-                     */
-                    Placement memeticPlacement = DynamicVMP.updatePlacementAfterReconf(workload, Constant.BFD,
-                            reconfgPlacementResult,
-                            memeticTimeInit,
-                            migrationTimeEnd);
-
-                    // Update the placement score after filtering dead  virtual machines.
-                    reconfgPlacementResult.updatePlacementScore(aPrioriValuesList);
-
-                    if(DynamicVMP.isMememeticPlacementBetter(placements.get(actualTimeUnit), memeticPlacement)) {
-                        physicalMachines = new ArrayList<>(memeticPlacement.getPhysicalMachines());
-                        virtualMachines = new ArrayList<>(memeticPlacement.getVirtualMachineList());
-                        derivedVMs = new ArrayList<>(memeticPlacement.getDerivedVMs());
-                    }
-                    // Set Migration Active
+                    //end the migration state
                     isMigrationActive = false;
                 }
             }
