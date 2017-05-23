@@ -201,7 +201,7 @@ public class DynamicVMP {
         Integer[] requestsProcessAfterReconf = initRequestProcess();
 
         // List of missed requests by Memetic Algorithm order by Revenue (excepts removed VM)
-        List<Scenario> cloneScenario = Scenario.cloneScneario(workload, startTimeMemeticAlg, endTimeMemeticAlg);
+        List<Scenario> cloneScenario = Scenario.cloneScenario(workload, startTimeMemeticAlg, endTimeMemeticAlg);
 
         cloneScenario.forEach(request ->
             runHeuristics(request, code, placement.getPhysicalMachines(), placement.getVirtualMachineList(),

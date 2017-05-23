@@ -19,7 +19,7 @@ public class StateOfArtUtils {
     public static boolean newVmDuringMemeticExecution(List<Scenario> workload, Integer memeticTimeInit,
             Integer memeticTimeEnd) {
 
-        List<Scenario> cloneScenario = Scenario.cloneScneario(workload, memeticTimeInit, memeticTimeEnd);
+        List<Scenario> cloneScenario = Scenario.cloneScenario(workload, memeticTimeInit, memeticTimeEnd);
 
         for (Scenario request : cloneScenario) {
             if (request.getTime() <= request.getTinit()) {

@@ -181,13 +181,13 @@ public class Scenario implements Comparable<Scenario> {
      * @param timeMemeticEnd   End time Memetic Algorithm
      * @return List of missed requests by Memetic Algorithm order by Revenue
      */
-    public static List<Scenario> cloneScneario(List<Scenario> workload, Integer timeMemeticStart,
-            Integer timeMemeticEnd) {
+    public static List<Scenario> cloneScenario(List<Scenario> workload, Integer timeMemeticStart,
+                                               Integer timeMemeticEnd) {
 
         List<Scenario> cloneScenario = new ArrayList<>();
 
         workload.forEach(request -> {
-            if(request.getTime() > timeMemeticStart && request.getTime() < timeMemeticEnd
+            if(request.getTime() >= timeMemeticStart && request.getTime() <= timeMemeticEnd
                     && request.getTend() > timeMemeticEnd) {
                 cloneScenario.add(request);
             }

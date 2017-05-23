@@ -445,7 +445,7 @@ public class Utils {
 			//if the vm is dead
 			if (vm.getTend() <= currentTimeUnit) {
 				toRemoveVMs.add(vm);
-				pm = PhysicalMachine.getById(vm.getPhysicalMachine(),physicalMachineList);
+				pm = PhysicalMachine.getById(vm.getPhysicalMachine()-1,physicalMachineList);
 				for(iteratorResource=0;iteratorResource<numberOfResources;iteratorResource++){
 					resourceUpdate = vm.getResources().get(iteratorResource)*(vm.getUtilization().get(iteratorResource)/100);
 					updatePMResRequested(pm,iteratorResource,resourceUpdate,false);
@@ -461,6 +461,8 @@ public class Utils {
                 toRemoveVMs.add(dvm);
             }
         });
+	    placement.getDerivedVMs().removeAll(toRemoveVMs);
+	    toRemoveVMs.clear();
 	}
 
     /**
@@ -492,7 +494,7 @@ public class Utils {
         Integer timeEndMigrationSec;
 		Integer vmEndTimeMigration;
         for(VirtualMachine vm : migratedVirtualMachines){
-            timeEndMigrationSec = Math.round((vm.getResources().get(ResourcesEnum.RAM.getIndex())*byteToBitsFactor)/ Parameter.LINK_CAPACITY);
+            timeEndMigrationSec = (int)Math.ceil((double)vm.getResources().get(ResourcesEnum.RAM.getIndex())*byteToBitsFactor/ Parameter.LINK_CAPACITY);
 			vmEndTimeMigration = currentTimeUnit + secondsToTimeUnit(timeEndMigrationSec, Constant.TIMEUNIT_DURATION);
             timeEndMigrationList.add(vmEndTimeMigration);
         }
