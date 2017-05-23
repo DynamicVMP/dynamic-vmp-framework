@@ -48,10 +48,10 @@ public class DynamicVMP {
     private static final Algorithm[] algorithms;
     static {
         algorithms = new Algorithm[]{
-                PeriodicMigration::periodicMigrationManager,            // Alg0 - Periodico con Update
-                StateOfArt::stateOfArtManager,                          // Alg1 - Periodico con Cancelacion
+                PeriodicMigration::periodicMigrationManager,            // Alg0 - Periodic with Update
+                StateOfArt::stateOfArtManager,                          // Alg1 - Periodic with Cancelacion
                 ThresholdBasedApproach::thresholdBasedApproachManager,  // Alg2 - Beloglazob
-                CleverReconfiguration::cleverReconfigurationgManager,   // Alg3 -
+                CleverReconfiguration::cleverReconfigurationgManager,   // Alg3 - Proposal
                 OnlineApproach::onlineApproachManager,                  // Alg4 - iVMP Only
         };
     }
