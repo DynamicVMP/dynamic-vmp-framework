@@ -445,7 +445,7 @@ public class Utils {
 			//if the vm is dead
 			if (vm.getTend() <= currentTimeUnit) {
 				toRemoveVMs.add(vm);
-				pm = PhysicalMachine.getById(vm.getPhysicalMachine()-1,physicalMachineList);
+				pm = PhysicalMachine.getById(vm.getPhysicalMachine(),physicalMachineList);
 				for(iteratorResource=0;iteratorResource<numberOfResources;iteratorResource++){
 					resourceUpdate = vm.getResources().get(iteratorResource)*(vm.getUtilization().get(iteratorResource)/100);
 					updatePMResRequested(pm,iteratorResource,resourceUpdate,false);

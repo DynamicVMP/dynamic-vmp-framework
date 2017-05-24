@@ -123,15 +123,15 @@ public class Individual {
         Integer iteratorPhysical, iteratorResources;
         Float utilizationOfResource, utilizationPercentage, resource;
 
-        for (iteratorPhysical=0;iteratorPhysical<physicalMachineList.size();iteratorPhysical++){
+        for (iteratorPhysical=1;iteratorPhysical<=physicalMachineList.size();iteratorPhysical++){
             for(iteratorResources=0;iteratorResources<numberOfResources;iteratorResources++){
-                resource = physicalMachineList.get(iteratorPhysical).getResources().get(iteratorResources);
-                utilizationOfResource = this.getUtilization()[iteratorPhysical][iteratorResources];
+                resource = PhysicalMachine.getById(iteratorPhysical,physicalMachineList).getResources().get(iteratorResources);
+                utilizationOfResource = this.getUtilization()[iteratorPhysical-1][iteratorResources];
 
                 utilizationPercentage = (utilizationOfResource/resource)*100;
 
-                physicalMachineList.get(iteratorPhysical).getResourcesRequested().set(iteratorResources,utilizationOfResource);
-                physicalMachineList.get(iteratorPhysical).getUtilization().set(iteratorResources,utilizationPercentage);
+                PhysicalMachine.getById(iteratorPhysical,physicalMachineList).getResourcesRequested().set(iteratorResources,utilizationOfResource);
+                PhysicalMachine.getById(iteratorPhysical,physicalMachineList).getUtilization().set(iteratorResources,utilizationPercentage);
             }
         }
 
