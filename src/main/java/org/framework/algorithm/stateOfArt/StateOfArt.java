@@ -169,7 +169,7 @@ public class StateOfArt {
 
                             // Update the time end of the memetic algorithm execution
                             reconfigurationTimeEnd = reconfigurationTimeInit + memeConfig.getExecutionDuration();
-
+                            Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE,nextTimeUnit);
                         }
                     }
                 }else if(nextTimeUnit != -1 && actualTimeUnit.equals(reconfigurationTimeEnd)) {
