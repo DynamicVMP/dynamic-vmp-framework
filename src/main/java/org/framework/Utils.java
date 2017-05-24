@@ -443,7 +443,7 @@ public class Utils {
 		//collect the vm to remove from the placement.VirtualMachine
 		for (VirtualMachine vm : placement.getVirtualMachineList()){
 			//if the vm is dead
-			if (vm.getTend() <= currentTimeUnit) {
+			if (vm.getTend() < currentTimeUnit) {
 				toRemoveVMs.add(vm);
 				pm = PhysicalMachine.getById(vm.getPhysicalMachine(),physicalMachineList);
 				for(iteratorResource=0;iteratorResource<numberOfResources;iteratorResource++){

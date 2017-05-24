@@ -188,7 +188,7 @@ public class Scenario implements Comparable<Scenario> {
 
         workload.forEach(request -> {
             if(request.getTime() >= timeMemeticStart && request.getTime() <= timeMemeticEnd
-                    && request.getTend() > timeMemeticEnd) {
+                    && request.getTend() >= timeMemeticEnd) {
                 cloneScenario.add(request);
             }
         });
