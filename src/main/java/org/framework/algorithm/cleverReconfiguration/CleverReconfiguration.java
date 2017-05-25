@@ -229,7 +229,7 @@ public class CleverReconfiguration {
                                 vmsMigrationEndTimes = Utils.getTimeEndMigrationByVM(vmsToMigrate, actualTimeUnit);
                                 //update migration end
                                 migrationTimeEnd = Utils.getMigrationEndTime(vmsMigrationEndTimes);
-                                isMigrationActive = true;
+                                isMigrationActive = !vmsToMigrate.isEmpty();
 
                                 physicalMachines = new ArrayList<>(reconfgPlacementMerged.getPhysicalMachines());
                                 virtualMachines = new ArrayList<>(reconfgPlacementMerged.getVirtualMachineList());
