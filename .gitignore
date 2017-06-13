@@ -1,5 +1,4 @@
 out/
 .idea/
 *.iml
-outputs/**
 target/**
