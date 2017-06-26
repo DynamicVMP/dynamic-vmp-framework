@@ -1,14 +1,21 @@
-# DynamicVMP Framework
+# Dynamic Virutal Machine Placement Framework
+
+This project contains the source code and results of the simulations for the paper entitled *"Two-Phase Virtual Machine Placement Algorithms for Cloud Computing. An experimental Evaluation Under Uncertainty"*.
+
+*Conferencia Latinoamericana de Informática (CLEI), 2017* \
+**Authors**: N. Chamas and F. Lopez-Pires and B. Barán
+
+##  
 
 To develop and execute the following items are required:
 
-## To develop:
+### To develop:
 
 1. Maven 3 or greater
 2. Java 8 (JDK 1.8)
 3. Java IDE (i.e. eclipse, intellij, ...)
 
-## To run:
+### To run:
 The framework could be compile with maven.
 
 1. Go to the project root and execute:
@@ -20,35 +27,33 @@ $ mvn clean package
 ``` bash
 $ java -jar target/DynamicVMPFramework.jar parameter
 ```
-## Parameter File Structure
-
-
+### Parameter File Structure
 
 1. APPROACH = Algorithm approach
  * CENTRALIZED
- * DISTRIBUTED -> This approach will automatically launch the distributed approach and you don't
-                  need to specify the following inputs: VMPr, VMPr_TRIGGERING, VMPr_RECOVERING.
-2. iVMP = iVMP algorithm
+ * DISTRIBUTED -> This approach will automatically launch the distributed approach and you don't need to specify the following inputs: VMPr, VMPr_TRIGGERING, VMPr_RECOVERING.
+ 
+2. iVMP = Algorithm for the incremental phase (iVMP).
  * FF -> First Fit
  * BF -> Best Fit
  * WF -> Worst Fit
  * FFD -> First Fit Decreasing
  * BFD -> Best Fit Decreasing
-3. VMPr = VMPr algorithm
- * MEMETIC
- * ACO
-4. VMPr_TRIGGERING = VMPr triggering
+3. VMPr = Algorithm for the reconfiguration phase (VMPr).
+ * MEMETIC -> Memetic Algorithm
+ * ACO -> Ant Colony Optimization
+4. VMPr_TRIGGERING = VMPr triggering strategy
  * PERIODICALLY
  * PREDICTION-BASED
-5. VMPr_RECOVERING = VMPr recovering
+5. VMPr_RECOVERING = VMPr recovering strategy
  * CANCELLATION
  * UPDATE-BASED
 6. PM_CONFIG = Load CPU Configuration
- * LOW
- * MED
- * HIGH
- * FULL
- * SATURATED
+ * LOW -> (<10%)
+ * MED  -> (<30%)
+ * HIGH  -> (<80%)
+ * FULL  -> (<95%)
+ * SATURATED  -> (<120%)
 7. DERIVE_COST = Cost per each derived VM
 8. PROTECTION_FACTOR_01 = Resource1 protection factor [0;1]
 9. PROTECTION_FACTOR_02 = Resource2 protection factor [0;1]
