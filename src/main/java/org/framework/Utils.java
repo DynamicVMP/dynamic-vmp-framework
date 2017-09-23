@@ -636,12 +636,25 @@ public class Utils {
             ((HashMap) parameterMap).put(line.split("=")[0], line.split("=")[1])
         );
 
+        int protectionFactorCount = (int) parameter.stream().filter(line -> line.contains("PROTECTION_FACTOR")).count();
+        int penaltyFactorCount = (int) parameter.stream().filter(line -> line.contains("PENALTY_FACTOR")).count();
+
         Parameter.ALGORITHM = Integer.parseInt( (String) parameterMap.get("ALGORITHM"));
         Parameter.HEURISTIC_CODE = (String) parameterMap.get("HEURISTIC_CODE");
         Parameter.PM_CONFIG = (String) parameterMap.get("PM_CONFIG");
         Parameter.DERIVE_COST = new Float ((String) parameterMap.get("DERIVE_COST"));
         Parameter.FAULT_TOLERANCE = Boolean.getBoolean( (String) parameterMap.get("FAULT_TOLERANCE"));
-        Parameter.PROTECTION_FACTOR =   new Float ((String) parameterMap.get("PROTECTION_FACTOR"));
+
+        Parameter.PROTECTION_FACTOR = new ArrayList<>();
+        for ( int index = 1; index <= protectionFactorCount; index++ ) {
+            Parameter.PROTECTION_FACTOR.add(new Float ((String) parameterMap.get("PROTECTION_FACTOR_"+String.format("%02d", index))));
+        }
+
+        Parameter.PENALTY_FACTOR = new ArrayList<>();
+        for ( int index = 1; index <= penaltyFactorCount; index++ ) {
+            Parameter.PENALTY_FACTOR.add(new Float ((String) parameterMap.get("PENALTY_FACTOR_"+String.format("%02d", index))));
+        }
+
         Parameter.INTERVAL_EXECUTION_MEMETIC = Integer.parseInt( (String) parameterMap.get
                 ("INTERVAL_EXECUTION_MEMETIC"));
         Parameter.POPULATION_SIZE = Integer.parseInt( (String) parameterMap.get("POPULATION_SIZE"));
@@ -653,9 +666,40 @@ public class Utils {
         Parameter.FORECAST_SIZE =Integer.parseInt( (String)  parameterMap.get("FORECAST_SIZE"));
         Parameter.SCALARIZATION_METHOD = (String) parameterMap.get("SCALARIZATION_METHOD");
 
+        prepareFilesSuffix();
+
         parameter.stream()
                  .filter(line -> line.split("=").length == 1 && !line.equals(SCENARIOS))
                  .forEach(scenariosFiles::add);
+    }
+
+    public static void prepareFilesSuffix() {
+        Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME =
+                "_A" + Parameter.ALGORITHM +
+                        "_" + Parameter.HEURISTIC_CODE +
+                        "_" + Parameter.PM_CONFIG +
+                        "_" + Parameter.DERIVE_COST +
+                        "_" + Parameter.EXECUTION_DURATION +
+                        "_" + Parameter.SCALARIZATION_METHOD;
+
+        int repeatedFileCount = 0;
+        File file;
+        boolean finding = true;
+        String newFileSuffix = "";
+        while ( finding ) {
+            newFileSuffix = repeatedFileCount == 0 ? "" : " ("+String.format("%03d",repeatedFileCount)+")";
+            file = new File(Constant.POWER_CONSUMPTION_FILE
+                    + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME
+                    + newFileSuffix);
+
+            if ( !file.isFile() ) {
+                finding = false;
+            } else {
+                repeatedFileCount++;
+            }
+        }
+
+        Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME = Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME + newFileSuffix;
     }
 
 

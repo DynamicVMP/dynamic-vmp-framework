@@ -46,19 +46,19 @@ public class Constraints {
         Float toReserveCPU = pm.getResourcesRequested().get(0)
             - (oldVm.getResources().get(0) * oldVm.getUtilization().get(0)/100 )
             + (vm.getResources().get(0) * vm.getUtilization().get(0)/100)
-            + (vm.getResources().get(0) * (1- vm.getUtilization().get(0)/100)*Parameter.PROTECTION_FACTOR);
+            + (vm.getResources().get(0) * (1- vm.getUtilization().get(0)/100)*Parameter.PROTECTION_FACTOR.get(0));
         Boolean checkCPU = toReserveCPU < pm.getResources().get(0);
 
         Float toReserveRAM = pm.getResourcesRequested().get(1)
             - (oldVm.getResources().get(1) * oldVm.getUtilization().get(1) / 100)
             + (vm.getResources().get(1) * vm.getUtilization().get(1) / 100)
-            + (vm.getResources().get(1) * (1 - vm.getUtilization().get(1) / 100) * Parameter.PROTECTION_FACTOR);
+            + (vm.getResources().get(1) * (1 - vm.getUtilization().get(1) / 100) * Parameter.PROTECTION_FACTOR.get(1));
         Boolean checkRAM = toReserveRAM < pm.getResources().get(1);
 
         Float toReserveNET = pm.getResourcesRequested().get(2)
             - (oldVm.getResources().get(2) * oldVm.getUtilization().get(2) / 100)
             + (vm.getResources().get(2) * vm.getUtilization().get(2) / 100)
-            + (vm.getResources().get(2) * (1 - vm.getUtilization().get(2) / 100) * Parameter.PROTECTION_FACTOR);
+            + (vm.getResources().get(2) * (1 - vm.getUtilization().get(2) / 100) * Parameter.PROTECTION_FACTOR.get(2));
         Boolean checkNET = toReserveNET < pm.getResources().get(2);
 
         Boolean flag = checkCPU && checkRAM && checkNET;
@@ -89,7 +89,7 @@ public class Constraints {
      * @param protectionFactor          Flag that indicates the degree of Overbooking
      * @return  <b>True</b>, if the PM is overloaded.
      */
-    public static Boolean checkPMOverloaded(PhysicalMachine pm, List<VirtualMachine> virtualMachinesAssoc, Float protectionFactor ){
+    public static Boolean checkPMOverloaded(PhysicalMachine pm, List<VirtualMachine> virtualMachinesAssoc, List<Float> protectionFactor ){
 
         float sumCpuResource = 0;
         float sumRamResource = 0;
@@ -98,13 +98,13 @@ public class Constraints {
         for(VirtualMachine vm : virtualMachinesAssoc){
 
             sumCpuResource += (vm.getResources().get(0) * vm.getUtilization().get(0)/100)
-                    + (vm.getResources().get(0) * (1- vm.getUtilization().get(0)/100)*protectionFactor);
+                    + (vm.getResources().get(0) * (1- vm.getUtilization().get(0)/100)*protectionFactor.get(0));
 
             sumRamResource += (vm.getResources().get(1) * vm.getUtilization().get(1)/100)
-                    + (vm.getResources().get(1) * (1- vm.getUtilization().get(1)/100)*protectionFactor);
+                    + (vm.getResources().get(1) * (1- vm.getUtilization().get(1)/100)*protectionFactor.get(1));
 
             sumNetResource += (vm.getResources().get(2) * vm.getUtilization().get(2)/100)
-                    + (vm.getResources().get(2) * (1- vm.getUtilization().get(2)/100)*protectionFactor);
+                    + (vm.getResources().get(2) * (1- vm.getUtilization().get(2)/100)*protectionFactor.get(2));
         }
 
         return sumCpuResource > pm.getResources().get(0)

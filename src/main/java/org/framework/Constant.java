@@ -25,6 +25,16 @@ public class Constant {
     public static final String PLACEMENT_SCORE_BY_TIME_FILE = Utils.OUTPUT + "placement_score_by_time/";
 
     /**
+     * Not a constant but once is setted, is used as
+     */
+    public static String EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME;
+
+    /**
+     * Not a constant but once is setted, is used as
+     */
+    public static String EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME;
+
+    /**
      * Heuristics Algorithms
      */
     public static final String BFD = "BFD";

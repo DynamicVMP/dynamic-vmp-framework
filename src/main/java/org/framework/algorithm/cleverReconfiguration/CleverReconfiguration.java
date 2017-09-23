@@ -135,7 +135,7 @@ public class CleverReconfiguration {
                 DynamicVMP.updateLeasingCosts(derivedVMs);
                 Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
                 // Print the Placement Score by Time t
-                Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile, placementScore);
+                Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, placementScore);
 
                 timeUnit = actualTimeUnit;
 
@@ -161,7 +161,7 @@ public class CleverReconfiguration {
 
                     // Check if a  call for reconfiguration is needed and set the init time
                     if(Utils.callToReconfiguration(valuesSelectedForecast, Parameter.FORECAST_SIZE)){
-                        Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE,nextTimeUnit);
+                        Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME,nextTimeUnit);
                         reconfigurationTimeInit = nextTimeUnit;
                         isReconfigurationActive=true;
                     }else{
