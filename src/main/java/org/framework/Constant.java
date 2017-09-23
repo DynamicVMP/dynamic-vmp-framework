@@ -30,11 +30,6 @@ public class Constant {
     public static String EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME;
 
     /**
-     * Not a constant but once is setted, is used as
-     */
-    public static String EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME;
-
-    /**
      * Heuristics Algorithms
      */
     public static final String BFD = "BFD";

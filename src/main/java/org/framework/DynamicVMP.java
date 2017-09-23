@@ -92,7 +92,7 @@ public class DynamicVMP {
      *      }
      * </pre>
      */
-    public static Map<Integer, Violation> unsatisfiedResources = new HashMap<>();
+    public static Map<String, Violation> unsatisfiedResources = new HashMap<>();
 
     private DynamicVMP () {
         // Default Constructor
