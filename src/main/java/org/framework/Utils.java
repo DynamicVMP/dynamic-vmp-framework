@@ -503,20 +503,21 @@ public class Utils {
 
     /**
      * Obtains the list of virtual machines to migrate
-     * @param newVirtualMachineList List of Virtual Machines
-     * @param oldVirtualMachineList List of Virtual Machines (after migration)
+     * @param reconfPlacement List of Virtual Machines
+     * @param actualPlacement List of Virtual Machines (after migration)
      * @return List of Virtual Machine
      */
-	public static List<VirtualMachine> getVMsToMigrate(List<VirtualMachine> newVirtualMachineList, List<VirtualMachine> oldVirtualMachineList){
+	public static List<VirtualMachine> getVMsToMigrate(List<VirtualMachine> reconfPlacement, List<VirtualMachine> actualPlacement){
         int iterator;
-        int oldPosition;
+        int actualPosition;
         int newPosition;
         List<VirtualMachine> vmsToMigrate = new ArrayList<>();
-        for(iterator=0;iterator<oldVirtualMachineList.size();iterator++){
-            oldPosition = oldVirtualMachineList.get(iterator).getPhysicalMachine();
-            newPosition = newVirtualMachineList.get(iterator).getPhysicalMachine();
-            if(oldPosition!=newPosition && newPosition!=0){
-                vmsToMigrate.add(newVirtualMachineList.get(iterator));
+        for(iterator=0;iterator<actualPlacement.size();iterator++){
+            System.out.printf("\n%d %d", actualPlacement.size(), reconfPlacement.size());
+            actualPosition = actualPlacement.get(iterator).getPhysicalMachine();
+            newPosition = reconfPlacement.get(iterator).getPhysicalMachine();
+            if(actualPosition!=newPosition && newPosition!=0){
+                vmsToMigrate.add(reconfPlacement.get(iterator));
             }
         }
 
@@ -680,6 +681,7 @@ public class Utils {
                         "_" + Parameter.PM_CONFIG +
                         "_" + Parameter.DERIVE_COST +
                         "_" + Parameter.EXECUTION_DURATION +
+                        "_" + Parameter.PENALTY_FACTOR.get(0) +
                         "_" + Parameter.SCALARIZATION_METHOD;
 
         int repeatedFileCount = 0;
@@ -688,7 +690,7 @@ public class Utils {
         String newFileSuffix = "";
         while ( finding ) {
             newFileSuffix = repeatedFileCount == 0 ? "" : " ("+String.format("%03d",repeatedFileCount)+")";
-            file = new File(Constant.POWER_CONSUMPTION_FILE
+            file = new File(Constant.SCENARIOS_SCORES
                     + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME
                     + newFileSuffix);
 
@@ -843,7 +845,7 @@ public class Utils {
     public static List<VirtualMachine> getVMsToMigrate(PhysicalMachine pm, List<VirtualMachine> vmsInPM) {
 
         PhysicalMachine pmCopy = new PhysicalMachine(pm.getId(),pm.getPowerMax(),pm.getResources(),pm.getResourcesRequested(),
-                pm.getUtilization());
+                pm.getUtilization(), pm.getResourcesReserved());
         List<VirtualMachine> vmsToMigrate = new ArrayList<>();
         MemoryComparator comparator =  new MemoryComparator();
         VirtualMachine vm;

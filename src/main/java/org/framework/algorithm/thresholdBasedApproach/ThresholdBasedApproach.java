@@ -116,9 +116,9 @@ public class ThresholdBasedApproach {
 
                 DynamicVMP.updateLeasingCosts(derivedVMs);
                 // Print the Placement Score by Time t
-                Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
+//                Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
                 // Print the Placement Score by Time t
-                Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, placementScore);
+//                Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, placementScore);
 
                 timeUnit = actualTimeUnit;
 

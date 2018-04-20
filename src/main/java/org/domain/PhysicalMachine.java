@@ -1,5 +1,6 @@
 package org.domain;
 
+import org.framework.Parameter;
 import org.framework.Utils;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class PhysicalMachine {
 
     private List<Float> utilization;
 
+    private List<Float> resourcesReserved;
+
     /* Constructors **/
 
     /**
@@ -37,12 +40,15 @@ public class PhysicalMachine {
         this.resources = resources;
         this.resourcesRequested = new ArrayList<>();
         this.utilization = new ArrayList<>();
+        this.resourcesReserved = new ArrayList<>();
 
         for (int i =0; i < resources.size(); i++) {
             Float newResource = 0F;
             resourcesRequested.add(newResource);
             Float newUtilization = 0F;
             utilization.add(newUtilization);
+            Float newResourceReserved = 0F;
+            resourcesReserved.add(newResourceReserved);
         }
     }
 
@@ -53,15 +59,17 @@ public class PhysicalMachine {
      * @param resources          Resources
      * @param resourcesRequested Requested Resources
      * @param utilization        Utilization
+     * @param resourcesReserved  Reserved Resources
      */
     public PhysicalMachine(Integer id, Integer powerMax, List<Float> resources,
-            List<Float> resourcesRequested, List<Float> utilization) {
+            List<Float> resourcesRequested, List<Float> utilization, List<Float> resourcesReserved) {
 
         this.id = id;
         this.powerMax = powerMax;
         this.resources = resources;
         this.resourcesRequested = Utils.getListClone(resourcesRequested);
         this.utilization = Utils.getListClone(utilization);
+        this.resourcesReserved = Utils.getListClone(resourcesReserved);
     }
 
     /* Getters and Setters */
@@ -90,6 +98,14 @@ public class PhysicalMachine {
     public void setUtilization(List<Float> utilization) {
 
         this.utilization = utilization;
+    }
+
+    public List<Float> getResourcesReserved() {
+        return this.resourcesReserved;
+    }
+
+    public void setResourcesReserved(List<Float> resourcesReserved) {
+        this.resourcesReserved = resourcesReserved;
     }
 
     public List<Float> getResources() {
@@ -140,29 +156,40 @@ public class PhysicalMachine {
     /**
      * Updated ResourcesRequested of a Physical Machine
      * @param resource      Resources index
-     * @param deltaResource New Resource
+     * @param vmResource    VM Resource
+     * @param vmUtilization VM Utilization
      * @param operation     Operation
      */
-    private void updateResource (Integer resource, Float deltaResource,
+    private void updateResource (Integer resource, Float vmResource, Float vmUtilization,
             String operation ) {
+
+        Float deltaResource = vmResource * vmUtilization / 100;
 
         if("SUM".equals(operation)) {
             Float newResource = deltaResource + this.getResourcesRequested().get(resource);
+            Float newResourceReserved = this.getResourcesReserved().get(resource) + deltaResource + vmResource * ( 1 - vmUtilization /100) * Parameter.PROTECTION_FACTOR.get(resource);
             this.getResourcesRequested().remove(resource.intValue());
             this.getResourcesRequested().add(resource, newResource);
+            this.getResourcesReserved().remove(resource.intValue());
+            this.getResourcesReserved().add(resource, newResourceReserved);
             return;
         }
 
         if("SUB".equals(operation)) {
             Float newResource = this.getResourcesRequested().get(resource) - deltaResource;
+            Float newResourceReserved = this.getResourcesReserved().get(resource) - (deltaResource + vmResource * ( 1 - vmUtilization /100) * Parameter.PROTECTION_FACTOR.get(resource));
             this.getResourcesRequested().remove(resource.intValue());
             this.getResourcesRequested().add(resource, newResource);
+            this.getResourcesReserved().remove(resource.intValue());
+            this.getResourcesReserved().add(resource, newResourceReserved);
             return;
         }
 
         if("MAX".equals(operation)) {
             this.getResourcesRequested().remove(resource.intValue());
             this.getResourcesRequested().add(resource, this.getResources().get(resource));
+            this.getResourcesReserved().remove(resource.intValue());
+            this.getResourcesReserved().add(resource, this.getResources().get(resource));
         }
     }
 
@@ -230,7 +257,7 @@ public class PhysicalMachine {
     private PhysicalMachine clonePM() {
 
         return new PhysicalMachine(this.getId(), this.getPowerMax(), this.getResources(),
-                this.getResourcesRequested(), this.getUtilization());
+                this.getResourcesRequested(), this.getUtilization(), this.getResourcesReserved());
 
     }
 
@@ -261,7 +288,7 @@ public class PhysicalMachine {
     public void updatePMResources(VirtualMachine vm, String operation) {
 
         for (int k = 0; k < this.getResources().size(); k++) {
-            this.updateResource(k, vm.getResources().get(k) * vm.getUtilization().get(k) /100, operation);
+            this.updateResource(k, vm.getResources().get(k), vm.getUtilization().get(k) , operation);
         }
         this.updateUtilization();
     }

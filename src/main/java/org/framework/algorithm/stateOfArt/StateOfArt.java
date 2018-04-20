@@ -129,9 +129,9 @@ public class StateOfArt {
                         maxPower, powerByTime, revenueByTime, wastedResourcesRatioByTime);
 
                 DynamicVMP.updateLeasingCosts(derivedVMs);
-                Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
+//                Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
                 // Print the Placement Score by Time t
-                Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, placementScore);
+//                Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, placementScore);
 
                 timeUnit = actualTimeUnit;
 
@@ -170,7 +170,7 @@ public class StateOfArt {
 
                             // Update the time end of the memetic algorithm execution
                             reconfigurationTimeEnd = reconfigurationTimeInit + memeConfig.getExecutionDuration();
-                            Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE,nextTimeUnit);
+//                            Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE,nextTimeUnit);
                         }
                     }
                 }else if(nextTimeUnit != -1 && actualTimeUnit.equals(reconfigurationTimeEnd)) {

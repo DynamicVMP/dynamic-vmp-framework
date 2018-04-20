@@ -79,9 +79,9 @@ public class OnlineApproach {
 						maxPower, powerByTime, revenueByTime, wastedResourcesRatioByTime);
 
 				DynamicVMP.updateLeasingCosts(derivedVMs);
-				Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
+//				Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
 				// Print the Placement Score by Time t
-				Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile, placementScore);
+//				Utils.printToFile( Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile, placementScore);
 
 				timeUnit = actualTimeUnit;
 

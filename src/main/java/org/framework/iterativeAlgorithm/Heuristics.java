@@ -116,7 +116,7 @@ public class Heuristics {
                 allocateVMToPM(updatedVM, physicalMachine);
                 return true;
             } else {
-                getViolation(s.getTime(), vm, updatedVM, physicalMachine);
+                getViolation(s.getTime(), vm, updatedVM);
                 return false;
             }
         }
@@ -152,45 +152,38 @@ public class Heuristics {
      * @param timeViolation Time Violation
      * @param oldVm         Virtual Machine (previous version of Virtual Machine)
      * @param vm            Virtual Machine (new version of Virtual Machine)
-     * @param pm            Physical Machine
      */
-    private static void getViolation(Integer timeViolation, VirtualMachine oldVm, VirtualMachine vm,
-            PhysicalMachine pm) {
+    private static Boolean getViolation(Integer timeViolation, VirtualMachine oldVm, VirtualMachine vm) {
 
-        Float cpuViolation = 0F;
-        Float ramViolation = 0F;
-        Float netViolation = 0F;
+        // use the protection factor to mitigate the violation
+        Float cpu = vm.getResources().get(0) * vm.getUtilization().get(0)/100
+                    - (oldVm.getResources().get(0) * oldVm.getUtilization().get(0)/100
+                        + oldVm.getResources().get(0) * (1 - oldVm.getUtilization().get(0)/100) * Parameter.PROTECTION_FACTOR.get(0));
 
-        Float cpu = pm.getResourcesRequested().get(0)
-                - (oldVm.getResources().get(0) * oldVm.getUtilization().get(0)/100 )
-                + (vm.getResources().get(0) * vm.getUtilization().get(0)/100);
+        Float ram = vm.getResources().get(1) * vm.getUtilization().get(1)/100
+                    - (oldVm.getResources().get(1) * oldVm.getUtilization().get(1)/100
+                        + oldVm.getResources().get(1) * (1 - oldVm.getUtilization().get(1)/100) * Parameter.PROTECTION_FACTOR.get(1));
 
-        Float ram = pm.getResourcesRequested().get(1)
-                - (oldVm.getResources().get(1) * oldVm.getUtilization().get(1)/100 )
-                + (vm.getResources().get(1) * vm.getUtilization().get(1)/100);
+        Float net = vm.getResources().get(2) * vm.getUtilization().get(2)/100
+                    - (oldVm.getResources().get(2) * oldVm.getUtilization().get(2)/100
+                        + oldVm.getResources().get(2) * (1 - oldVm.getUtilization().get(2)/100) * Parameter.PROTECTION_FACTOR.get(2));
 
+        Float cpuViolation = cpu > 0 ? cpu : 0F;
+        Float ramViolation = ram > 0 ? ram : 0F;
+        Float netViolation = net > 0 ? net : 0F;
 
-        Float net = pm.getResourcesRequested().get(2)
-                - (oldVm.getResources().get(2) * oldVm.getUtilization().get(2)/100 )
-                + (vm.getResources().get(2) * vm.getUtilization().get(2)/100);
+        // if violation was not mitigated by the resources reserved by the protection factor
+        if(cpuViolation > 0 || ramViolation > 0 || netViolation > 0) {
+            Resources res = new Resources(cpuViolation, ramViolation, netViolation);
+            Violation violation = new Violation(timeViolation, res);
 
-        if(pm.getResources().get(0) <= cpu) {
-            cpuViolation = cpu - pm.getResources().get(0);
+            DynamicVMP.updateEconomicalPenalties(vm,res, timeViolation);
+            DynamicVMP.unsatisfiedResources.put(vm.getCloudService()+"_"+vm.getId(), violation);
+            return false;
         }
 
-        if(pm.getResources().get(1) <= ram) {
-            ramViolation = ram - pm.getResources().get(1);
-        }
-
-        if(pm.getResources().get(2) <= net) {
-            netViolation = net - pm.getResources().get(2);
-        }
-
-        Resources res = new Resources(cpuViolation, ramViolation, netViolation);
-        Violation violation = new Violation(timeViolation, res);
-
-        DynamicVMP.updateEconomicalPenalties(vm,res, timeViolation);
-        DynamicVMP.unsatisfiedResources.put(vm.getCloudService()+"_"+vm.getId(), violation);
+        // violation has been successful mitigated by the resources reserved by the protection factor
+        return true;
     }
 
     /**

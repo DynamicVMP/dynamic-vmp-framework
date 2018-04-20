@@ -344,9 +344,9 @@ public class DynamicVMP {
 
         Integer[] requestsProcess = initRequestProcess();
         Float[] realRevenue = new Float[]{0F};
-        Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
-        Files.write(Paths.get(Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME),
-                (scenarioFile + "\n" ).getBytes(), StandardOpenOption.CREATE);
+//        Utils.checkPathFolders(Constant.PLACEMENT_SCORE_BY_TIME_FILE);
+//        Files.write(Paths.get(Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME),
+//                (scenarioFile + "\n" ).getBytes(), StandardOpenOption.CREATE);
 
         // LIST
         List<Resources> wastedResources = new ArrayList<>();
@@ -388,14 +388,14 @@ public class DynamicVMP {
 
         Float scenarioScored = ObjectivesFunctions.getScenarioScore(revenueByTime, placements, realRevenue);
 
-        Utils.printToFile(Constant.POWER_CONSUMPTION_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgPwConsumptionNormalized(powerByTime));
-        Utils.printToFile(Constant.WASTED_RESOURCES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgResourcesWNormalized(wastedResourcesRatioByTime));
-        Utils.printToFile(Constant.ECONOMICAL_REVENUE_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgRevenueNormalized(revenueByTime));
-        Utils.printToFile(Constant.WASTED_RESOURCES_RATIO_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, wastedResources);
+//        Utils.printToFile(Constant.POWER_CONSUMPTION_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgPwConsumptionNormalized(powerByTime));
+//        Utils.printToFile(Constant.WASTED_RESOURCES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgResourcesWNormalized(wastedResourcesRatioByTime));
+//        Utils.printToFile(Constant.ECONOMICAL_REVENUE_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, Utils.getAvgRevenueNormalized(revenueByTime));
+//        Utils.printToFile(Constant.WASTED_RESOURCES_RATIO_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, wastedResources);
         Utils.printToFile(Constant.SCENARIOS_SCORES + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, scenarioScored);
-        Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME,"\n");
-        Utils.printToFile(Constant.ECONOMICAL_PENALTIES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, DynamicVMP.economicalPenalties);
-        Utils.printToFile(Constant.LEASING_COSTS_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, DynamicVMP.leasingCosts);
+//        Utils.printToFile(Constant.RECONFIGURATION_CALL_TIMES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME,"\n");
+//        Utils.printToFile(Constant.ECONOMICAL_PENALTIES_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, DynamicVMP.economicalPenalties);
+//        Utils.printToFile(Constant.LEASING_COSTS_FILE + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, DynamicVMP.leasingCosts);
     }
 
     /**
@@ -415,7 +415,7 @@ public class DynamicVMP {
                 wastedResources.add(new Resources());
                 wastedResourcesRatioByTime.put(timeAdjust, 0F);
                 revenueByTime.put(timeAdjust, 0F);
-                Utils.printToFile(Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, 0);
+//                Utils.printToFile(Constant.PLACEMENT_SCORE_BY_TIME_FILE + scenarioFile + Constant.EXPERIMENTS_PARAMETERS_TO_OUTPUT_NAME, 0);
                 timeAdjust++;
                 timeSimulated += 1;
             }
