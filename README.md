@@ -1,4 +1,4 @@
-# Dynamic Virutal Machine Placement Framework
+# Dynamic Virtual Machine Placement Framework
 
 This project contains the source code and results of the following research:
 
