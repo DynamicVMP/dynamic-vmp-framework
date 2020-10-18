@@ -54,13 +54,10 @@ public class Aco {
 
         // local variables
         Float tempAntScore, antScore, bestAntScore, globalScore, initialScore;
-//        Float nAntMigrations;
-
 
         List<PhysicalMachine> antPMs;
         List<PhysicalMachine> bestAntPMs;
         List<PhysicalMachine> mapPMs;
-
 
         List<VirtualMachine> antVMs;
         List<VirtualMachine> bestAntVMs;
@@ -75,8 +72,7 @@ public class Aco {
                 actualPlacement.getDerivedVMs(), actualPlacement.getPhysicalMachines());
         initialScore = Utils.calcPlacemenScore(objectiveFunctions, aPrioriValueList);
         globalScore = initialScore;
-        // printing
-//        System.out.println("\nfirst score: " + globalScore);
+
         while(acoIterations>0){
             acoIterations--;
             bestAntScore = initialScore;
@@ -86,7 +82,6 @@ public class Aco {
 
             for(int a=0; a<nAnts; a++){
                 antScore = initialScore;
-//                nAntMigrations = 0F;
 
                 antPMs = PhysicalMachine.clonePMsList(actualPlacement.getPhysicalMachines());
                 antVMs = VirtualMachine.cloneVMsList(VirtualMachine.cloneVMsList(actualPlacement.getVirtualMachineList()));
@@ -97,35 +92,18 @@ public class Aco {
                 for(int v=0; v<nVMs; v++){
                     computeHeuristic();
                     computeProbability();
-                    chooseRandomVMandPM();
-
-                    // now we have a
-                    // randomVM and random PM
-                    // based on normalizedProb[v][p]
-
-//                  objective functions here
+                    choosePMforVM(v);
                     updateTempVMsandPMs();
-//                    nAntMigrations++;
 
                     // evaluate tempAntScore
                     loadObjectiveFunctions(tempAntVMs, antVMs, actualPlacement.getDerivedVMs(), tempAntPMs);
-
                     tempAntScore = Utils.calcPlacemenScore(objectiveFunctions, aPrioriValueList);
 
-//                    debug only
-//                    Integer v11 = randomVM;
-//                    Integer p11 = randomPM;
-
+                    // replaces the best solution if Ant found a better one
                     if(tempAntScore<antScore){
                         antScore = tempAntScore;
                         antPMs = PhysicalMachine.clonePMsList(tempAntPMs);
                         antVMs = VirtualMachine.cloneVMsList(tempAntVMs);
-                    }
-                    else {
-                        // rollback the migration
-//                        nAntMigrations--;
-                        tempAntPMs = PhysicalMachine.clonePMsList(antPMs);
-                        tempAntVMs = VirtualMachine.cloneVMsList(antVMs);
                     }
                 }
 
@@ -133,26 +111,14 @@ public class Aco {
                     bestAntScore = antScore;
                     bestAntPMs = PhysicalMachine.clonePMsList(antPMs);
                     bestAntVMs = VirtualMachine.cloneVMsList(antVMs);
-
-//                  printing
-//                    if(a!=0){
-//                        System.out.println("bestAntScore: " + bestAntScore + "\t\ta: "+a);
-//                    }
                 }
-            } // end of ants
+            } // end Ants
 
             // update globalScore, mapPMs, mapVMs according to the best ant if appropiate
             if(bestAntScore<globalScore){
                 globalScore = bestAntScore;
-
-//                debug only
-//                Boolean equalList = compareVMLists(mapVMs, bestAntVMs);
-
                 mapPMs = PhysicalMachine.clonePMsList(bestAntPMs);
                 mapVMs = VirtualMachine.cloneVMsList(bestAntVMs);
-
-                // printing
-//                System.out.println("globalScore: " + globalScore + "\t\tacoIterations: "+acoIterations);
             }
 
             // update pheromone
@@ -161,13 +127,12 @@ public class Aco {
                     Integer pmIdIterator = mapPMs.get(p).getId();
                     Integer pmId = mapVMs.get(v).getPhysicalMachine();
                     if(pmId.equals(pmIdIterator)) {
-//                        pheromone[v][p] = (1 - settings.getPheromoneConstant()) * pheromone[v][p] + ((1/globalScore)*20);
-                        pheromone[v][p] = (1 - settings.getPheromoneConstant()) * pheromone[v][p] + (1-globalScore);
+                        pheromone[v][p] = (1 - settings.getPheromoneConstant()) * pheromone[v][p] + (1/globalScore);
                     }else{
                         pheromone[v][p] = (1 - settings.getPheromoneConstant()) * pheromone[v][p];
                     }
 
-                    // check max pheromone boundary
+                    // check max and min pheromone
                     if(pheromone[v][p]>1F){
                         pheromone[v][p] = 1.0F;
                     }else if(pheromone[v][p]<0.2F){
@@ -176,18 +141,10 @@ public class Aco {
                 }
             }
 
-        } // end while
+        } // end ACO iterations
 
         Placement newPlacement = new Placement(mapPMs,mapVMs,actualPlacement.getDerivedVMs());
         newPlacement.setPlacementScore(globalScore);
-
-//        debug only
-//        Boolean equalList = compareVMLists(actualPlacement.getVirtualMachineList(), newPlacement.getVirtualMachineList());
-//        if(equalList) {
-//            System.out.println("Returned score: " + globalScore+"\t\t equalList");
-//        }else {
-//            System.out.println("Returned score: "+ globalScore+"\t\t NOT equalList");
-//        }
 
         return newPlacement;
     }
@@ -247,12 +204,12 @@ public class Aco {
 
 
     /**
-     * Update the resources of the new randomPM selected, as well as the oldPM
-     * of the randomVM chosen. It also sets the PM of randomVM to randomPM.
+     * Update the resources of the pmSelected, as well as the oldPM
+     * of the vmSelected chosen. It also sets the PM of vmSelected to pmSelected.
      */
     private void updateTempVMsandPMs() {
-        PhysicalMachine pm = tempAntPMs.get(randomPM);
-        VirtualMachine vm = tempAntVMs.get(randomVM);
+        PhysicalMachine pm = tempAntPMs.get(pmSelected);
+        VirtualMachine vm = tempAntVMs.get(vmSelected);
         PhysicalMachine oldPM = PhysicalMachine.getById(vm.getPhysicalMachine(), tempAntPMs);
 
         if(!pm.getId().equals(oldPM.getId())) {
@@ -280,26 +237,7 @@ public class Aco {
                 pm.updateResource(1, vmResource1, "SUM");
                 pm.updateResource(2, vmResource2, "SUM");
             }
-
-////            debug only
-//            else{
-//                System.out.println("ERROR freeSpace. Line 243.");
-//                System.out.println("freeSpace0: "+freeSpace0);
-//                System.out.println("freeSpace1: "+freeSpace1);
-//                System.out.println("freeSpace2: "+freeSpace2);
-//                System.out.println("normalizedProb: "+normalizedProb[randomVM][randomPM]);
-//                System.out.println("heuristic: "+heuristic[randomVM][randomPM]);
-//                System.out.println("pheromone: "+pheromone[randomVM][randomPM]);
-//                if(oldPM.getId()==null){
-//                    System.out.println("oldPM = null.");
-//                }
-//            }
         }
-
-//        debug only
-//        else {
-//            System.out.println("same PM. randomVM(index)= "+randomVM+" randomPM(index)= "+randomPM);
-//        }
     }
 
 
@@ -307,59 +245,18 @@ public class Aco {
      *  Generate a random number between [0,1] and then based on the cumulative
      *  probability a randomVM and randomPM are chosen.
      */
-    private void chooseRandomVMandPM() {
+    private void choosePMforVM(vm) {
         Double randomProb = Math.random();
-
-        randomVM = 0;
-        randomPM = 0;
-
-//        this code wasnt right I guess
-//        if(normalizedProb[0][0]>randomProb) {
-//            randomVM=0;
-//            randomPM=0;
-//        }else {
-//            Boolean finish;
-//            for (int v = 0; v < nVMs; v++) {
-//                finish = false;
-//                for (int p = 0; p < nPMs; p++) {
-//                    if (normalizedProb[v][p] > randomProb) {
-//                        if (p == 0) {
-//                            randomVM = v-1;
-//                            randomPM = nPMs-1;
-//                        } else {
-//                            randomVM = v;
-//                            randomPM = p-1;
-//                        }
-//                        finish = true;
-//                        break;
-//                    }
-//                }
-//                if (finish) {
-//                    break;
-//                }
-//            }
-//        }
-
-
+        vmSelected = vm;
+        pmSelected = 0;
         Boolean finish=false;
-        for (int v = 0; v < nVMs; v++) {
-            for (int p = 0; p < nPMs; p++) {
-                if (normalizedProb[v][p] >= randomProb) {
-                    randomVM = v;
-                    randomPM = p;
-                    finish = true;
-                    break;
-                }
-            }
-            if (finish) {
+        for (int p = 0; p < nPMs; p++) {
+            if (normalizedProb[vmSelected][p] >= randomProb) {
+                pmSelected = p;
+                finish = true;
                 break;
             }
         }
-
-//        debug only
-//        if(!finish){
-//            System.out.println("FINISH false. Line 299.");
-//        }
     }
 
 
@@ -374,61 +271,12 @@ public class Aco {
         Integer pmId;
         VirtualMachine vm;
 
-//      old approach
-//        for(int v=0; v<nVMs; v++){
-//            sum=0F;
-//            vm = tempAntVMs.get(v);
-//            for(int p=0; p<nPMs; p++){
-//                for(int eachVM=0; eachVM<nVMs; eachVM++){
-//                    pmId = vm.getPhysicalMachine();
-//
-////                    pay attention to this
-//                    if(pmId.equals(tempAntPMs.get(p).getId())){
-//                        sum += (pheromone[eachVM][p]*heuristic[eachVM][p]);
-//                    }
-//                }
-//
-//                if(sum>0.00000001F){
-//                    probability[v][p] = (pheromone[v][p]*heuristic[v][p])/sum;
-//                    sumProbabilities += probability[v][p];
-//                }else {
-//                    probability[v][p] = 0F;
-//                }
-//            }
-//        }
-
-        // first approach, every "v" in "p"
-        // take care with "sum", when "p" of same place is zero
-//        for(int p=0; p<nPMs; p++){
-//            sum=0F;
-//            pmId = tempAntPMs.get(p).getId();
-//            for(int eachVM=0; eachVM<nVMs; eachVM++){
-//                if(tempAntVMs.get(eachVM).getPhysicalMachine().equals(pmId)){
-//                    sum += (pheromone[eachVM][p]*heuristic[eachVM][p]);
-//                }
-//            }
-//
-//            if(sum>0.00000001F){
-//                for(int v=0; v<nVMs; v++){
-//                    probability[v][p] = (pheromone[v][p]*heuristic[v][p])/sum;
-//                    sumProbabilities += probability[v][p];
-//                }
-//            }else{
-//                for(int v=0; v<nVMs; v++){
-//                    probability[v][p] = 0F;
-//                }
-//            }
-//        }
-
-        // second approach, normalized already
         for(int p=0; p<nPMs; p++){
             for(int v=0; v<nVMs; v++){
                 probability[v][p] = (pheromone[v][p]*heuristic[v][p]);
                 sumProbabilities += probability[v][p];
             }
         }
-
-
         // normalizing probability
         if(sumProbabilities!=0F){
             for(int v=0; v<nVMs; v++){
@@ -436,24 +284,7 @@ public class Aco {
                     normalizedProb[v][p] = probability[v][p]/sumProbabilities;
                 }
             }
-
-            // cumulative
-            Float last=0F;
-            for(int v=0; v<nVMs; v++){
-                for(int p=0; p<nPMs; p++){
-                    if(normalizedProb[v][p]!=0){
-                        normalizedProb[v][p] += last;
-                        last = normalizedProb[v][p];
-                    }
-                }
-            }
         }
-
-//        debug only
-//        else {
-//            System.out.println("ERROR sumP robabilities = 0, dividing.");
-//        }
-
     }
 
     /**
@@ -473,11 +304,6 @@ public class Aco {
         Float vmResource1;
         Float vmResource2;
         Integer pmId, pmOfVm;
-
-//        debug only
-//        if(tempAntVMs.size()==14){
-//            System.out.println("debug 14.");
-//        }
 
         for(int v=0; v<nVMs; v++){
             for(int p=0; p<nPMs; p++){
@@ -500,10 +326,10 @@ public class Aco {
                             vmResource2);
 
                     if (freeSpace0 >= 0.00000001F && freeSpace1 >= 0.00000001F && freeSpace2 >= 0.00000001F) {
-                        heuristic0 = 1 / freeSpace0;
-                        heuristic1 = 1 / freeSpace1;
-                        heuristic2 = 1 / freeSpace2;
-                        heuristic[v][p] = (heuristic0 + heuristic1 + heuristic2) / 3;
+                        freeSpaceRatio0 = freeSpace0 / pm.getResources().get(0);
+                        freeSpaceRatio1 = freeSpace1 / pm.getResources().get(1);
+                        freeSpaceRatio2 = freeSpace2 / pm.getResources().get(2);
+                        heuristic[v][p] = (freeSpaceRatio0 + freeSpaceRatio1 + freeSpaceRatio2) / 3;
                     } else {
                         heuristic[v][p] = 0F;
                     }
