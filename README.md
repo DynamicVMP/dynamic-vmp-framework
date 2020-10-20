@@ -107,13 +107,14 @@ $ java -jar target/DynamicVMPFramework.jar parameter
  * CD -> Chevyshev Distance
  * WS -> Weighted Sum
 23. MAX_PHEROMONE = Max pheromone allowed in ACO
-24. PHEROMONE_CONSTANT = Pheromone constant for ACO, range [0,1],
+24. MIN_PHEROMONE = Min pheromone allowed in ACO
+25. PHEROMONE_CONSTANT = Pheromone constant for ACO, range [0,1],
 determines how fast pheromone evaporates. Pheromones evaporates
 quicker as pheromone constant grows
-25. N_ANTS = Number of ants used for ACO
-26. ACO_ITERATIONS = Number of iterations to be performed in ACO
+26. N_ANTS = Number of ants used for ACO
+27. ACO_ITERATIONS = Number of iterations to be performed in ACO
 to return a solution
-27. SCENARIOS = List of Request
+28. SCENARIOS = List of Request
 
 #### Output Files
 The framework generates the following files:
